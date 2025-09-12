@@ -1,1 +1,48 @@
-<p>proposal-form works!</p>
+<div class="card">
+  <h2>{{ proposalId ? 'Modifica proposta' : 'Nuova proposta' }}</h2>
+  <p class="muted">Proponi un menù con uno o più piatti</p>
+
+  <form [formGroup]="form">
+    <div class="form-row cols-2">
+      <div>
+        <label for="title">Titolo</label>
+        <input id="title" class="input" formControlName="title" placeholder="Es. Pranzo del mercoledì" />
+      </div>
+      <div>
+        <label for="notes">Note</label>
+        <input id="notes" class="input" formControlName="notes" placeholder="Opzionale" />
+      </div>
+    </div>
+
+    <h3 class="mt">Piatti</h3>
+
+    <div formArrayName="items" class="mt">
+      <div class="card mb" *ngFor="let it of items.controls; let i = index" [formGroupName]="i">
+        <div class="form-row cols-2">
+          <div>
+            <label>Nome piatto</label>
+            <input class="input" formControlName="name" placeholder="Es. Pasta al forno" />
+          </div>
+          <div>
+            <label>Note</label>
+            <input class="input" formControlName="notes" placeholder="Es. vegetariano, piccante..." />
+          </div>
+        </div>
+        <div class="mt">
+          <button type="button" class="btn danger" (click)="removeItem(i)">Rimuovi</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt">
+      <button type="button" class="btn" (click)="addItem()">+ Aggiungi piatto</button>
+    </div>
+
+    <div class="mt flex" style="justify-content:flex-end">
+      <button type="button" class="btn secondary" (click)="saveDraft()">Salva bozza</button>
+      <button type="button" class="btn" (click)="submit()">Invia</button>
+    </div>
+  </form>
+
+  <p *ngIf="message" class="mt">{{ message }}</p>
+</div>

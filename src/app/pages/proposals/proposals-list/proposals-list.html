@@ -1,1 +1,43 @@
-<p>proposals-list works!</p>
+<div class="card">
+  <div class="flex" style="align-items:center; justify-content:space-between;">
+    <h2>Le mie proposte</h2>
+    <button class="btn" (click)="createNew()">+ Nuova proposta</button>
+  </div>
+
+  <!-- Filtri stato -->
+  <nav class="tabs mt">
+    <button (click)="setFilter('all')"      [class.active]="status() === 'all'">Tutte</button>
+    <button (click)="setFilter('draft')"    [class.active]="status() === 'draft'">Bozze</button>
+    <button (click)="setFilter('submitted')" [class.active]="status() === 'submitted'">Inviate</button>
+    <button (click)="setFilter('approved')" [class.active]="status() === 'approved'">Approvate</button>
+    <button (click)="setFilter('rejected')" [class.active]="status() === 'rejected'">Rifiutate</button>
+  </nav>
+
+  <p *ngIf="message()" class="mt">{{ message() }}</p>
+  <p *ngIf="loading()" class="mt muted">Caricamento…</p>
+
+  <div class="grid mt" *ngIf="!loading()">
+    <div class="event-card" *ngFor="let p of proposals()">
+      <div class="title">{{ p.title }}</div>
+      <small class="muted">{{ p.created_at | date:'short' }}</small>
+
+      <div class="meta">
+        <span class="badge">Stato: {{ p.status }}</span>
+        <span class="badge ocra">{{ p.itemsCount }} piatti</span>
+      </div>
+
+      <p *ngIf="p.notes" class="mt">{{ p.notes }}</p>
+
+      <div class="actions mt">
+        <button class="btn secondary" (click)="edit(p)">Modifica</button>
+        <button class="btn" (click)="submit(p)" [disabled]="p.status !== 'draft'">Invia</button>
+        <button class="btn" (click)="duplicate(p)">Duplica</button>
+        <button class="btn danger" (click)="remove(p)">Elimina</button>
+      </div>
+    </div>
+  </div>
+
+  <p *ngIf="!loading() && proposals().length === 0" class="mt muted">
+    Nessuna proposta trovata. Creane una nuova!
+  </p>
+</div>
