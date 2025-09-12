@@ -1,1 +1,7 @@
-<p>event-items works!</p>
+ <div class="grid">
+      <div class="card" *ngFor="let it of items">
+        <h3>{{ it.name }}</h3>
+        <p class="muted">{{ it.notes || '—' }}</p>
+      </div>
+    </div>
+    <p *ngIf="!items?.length" class="muted">Nessun piatto.</p>

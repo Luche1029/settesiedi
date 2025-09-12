@@ -1,1 +1,33 @@
-<p>menu-detail works!</p>
+<div class="menu-detail" *ngIf="event(); else loadingTpl">
+  <div>
+    <div class="card">
+      <h2>{{ event()?.title || (event()?.event_date | date:'EEEE d MMMM') }}</h2>
+      <p class="muted">{{ event()?.event_date | date:'fullDate' }}</p>
+
+      <nav class="tabs mt">
+        <button (click)="tab='items'" [class.active]="tab==='items'">Piatti</button>
+        <button (click)="tab='rsvp'"  [class.active]="tab==='rsvp'">Prenotazioni</button>
+        <button (click)="tab='exp'"   [class.active]="tab==='exp'">Spese</button>
+        <button (click)="tab='bal'"   [class.active]="tab==='bal'">Bilanci</button>
+      </nav>
+
+      <section [ngSwitch]="tab" class="mt">
+        <app-event-items   *ngSwitchCase="'items'" [eventId]="eventId" [items]="event()?.event_item || []"></app-event-items>
+        <app-reservations  *ngSwitchCase="'rsvp'"  [eventId]="eventId"></app-reservations>
+        <app-expenses      *ngSwitchCase="'exp'"   [eventId]="eventId"></app-expenses>
+        <app-balances      *ngSwitchCase="'bal'"   [eventId]="eventId"></app-balances>
+      </section>
+    </div>
+  </div>
+
+  <aside class="menu-summary">
+    <h3>Note</h3>
+    <p>{{ event()?.notes || '—' }}</p>
+  </aside>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="card"><p class="muted">Caricamento…</p></div>
+</ng-template>
+
+<p *ngIf="message()" class="mt">{{ message() }}</p>

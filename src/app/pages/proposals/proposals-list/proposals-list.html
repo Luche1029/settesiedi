@@ -18,10 +18,13 @@
 
   <div class="grid mt" *ngIf="!loading()">
     <div class="event-card" *ngFor="let p of proposals()">
-      <div class="title">{{ p.title }}</div>
+      <!-- titolo → data proposta -->
+      <div class="title">{{ p.proposal_date | date:'EEEE d MMMM y' }}</div>
       <small class="muted">{{ p.created_at | date:'short' }}</small>
 
+      <!-- aggiungi nome proponente -->
       <div class="meta">
+        <span class="badge">Proposto da: {{ p.proposerName }}</span>
         <span class="badge">Stato: {{ p.status }}</span>
         <span class="badge ocra">{{ p.itemsCount }} piatti</span>
       </div>
@@ -36,6 +39,7 @@
       </div>
     </div>
   </div>
+
 
   <p *ngIf="!loading() && proposals().length === 0" class="mt muted">
     Nessuna proposta trovata. Creane una nuova!

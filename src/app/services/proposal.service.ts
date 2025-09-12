@@ -4,29 +4,31 @@ import { supabase } from '../supabase.client';
 
 export interface ProposalItemInput { name: string; notes?: string; }
 export interface ProposalInput {
-  title: string;
+  proposalDate: string;  // "YYYY-MM-DD"
   notes?: string;
   items: ProposalItemInput[];
 }
+
 
 @Injectable({ providedIn: 'root' })
 export class ProposalService {
 
   async createDraft(userId: string, payload: ProposalInput) {
-    // 1) crea proposal (status = 'draft')
     const { data: prop, error: e1 } = await supabase
       .from('proposal')
-      .insert({ user_id: userId, title: payload.title, notes: payload.notes ?? '', status: 'draft' })
+      .insert({
+        user_id: userId,
+        proposal_date: payload.proposalDate,
+        notes: payload.notes ?? '',
+        status: 'draft'
+      })
       .select()
       .single();
     if (e1) throw e1;
 
-    // 2) inserisci items (se presenti)
     if (payload.items?.length) {
       const rows = payload.items.map(it => ({
-        proposal_id: prop.id,
-        name: it.name,
-        notes: it.notes ?? ''
+        proposal_id: prop.id, name: it.name, notes: it.notes ?? ''
       }));
       const { error: e2 } = await supabase.from('proposal_item').insert(rows);
       if (e2) throw e2;
@@ -37,19 +39,19 @@ export class ProposalService {
   async updateDraft(proposalId: string, payload: ProposalInput) {
     const { error: e1 } = await supabase
       .from('proposal')
-      .update({ title: payload.title, notes: payload.notes ?? '' })
+      .update({
+        proposal_date: payload.proposalDate,
+        notes: payload.notes ?? ''
+      })
       .eq('id', proposalId);
     if (e1) throw e1;
 
-    // Semplice: elimina e reinserisci gli items
     const { error: eDel } = await supabase.from('proposal_item').delete().eq('proposal_id', proposalId);
     if (eDel) throw eDel;
 
     if (payload.items?.length) {
       const rows = payload.items.map(it => ({
-        proposal_id: proposalId,
-        name: it.name,
-        notes: it.notes ?? ''
+        proposal_id: proposalId, name: it.name, notes: it.notes ?? ''
       }));
       const { error: e2 } = await supabase.from('proposal_item').insert(rows);
       if (e2) throw e2;
@@ -57,16 +59,10 @@ export class ProposalService {
     return true;
   }
 
-  async submit(proposalId: string) {
-    const { error } = await supabase.from('proposal').update({ status: 'submitted' }).eq('id', proposalId);
-    if (error) throw error;
-    return true;
-  }
-
   async getWithItems(proposalId: string) {
     const { data: prop, error } = await supabase
       .from('proposal')
-      .select('id, user_id, title, notes, status, proposal_item(id, name, notes)')
+      .select('id, user_id, proposal_date, notes, status, proposal_item(id, name, notes)')
       .eq('id', proposalId)
       .single();
     if (error) throw error;
@@ -76,17 +72,24 @@ export class ProposalService {
   async listMine(userId: string, status?: string) {
     let q = supabase
       .from('proposal')
-      .select('id, title, notes, status, created_at, proposal_item(count)')
+      .select('id, proposal_date, notes, status, created_at, app_user:user_id(display_name), proposal_item(count)')
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
     if (status && status !== 'all') q = q.eq('status', status);
     const { data, error } = await q;
     if (error) throw error;
-    return data as Array<{
-      id: string; title: string; notes: string | null; status: string; created_at: string;
-      proposal_item: { count: number }[];
-    }>;
+    return (data || []).map((r: any) => ({
+      ...r,
+      itemsCount: r.proposal_item?.[0]?.count ?? 0,
+      proposerName: r.app_user?.display_name ?? '—'
+    }));
+  }
+
+  async submit(proposalId: string) {
+    const { error } = await supabase.from('proposal').update({ status: 'submitted' }).eq('id', proposalId);
+    if (error) throw error;
+    return true;
   }
 
   async remove(id: string) {

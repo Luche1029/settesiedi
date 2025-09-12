@@ -1,1 +1,24 @@
-<p>balances works!</p>
+<div class="card">
+      <h3>Bilanci evento</h3>
+
+      <table class="table mt" *ngIf="nets().length">
+        <thead><tr><th>Utente</th><th>Netto</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let n of nets()">
+            <td>{{ n.name }}</td>
+            <td [style.color]="n.net>=0 ? 'green' : 'crimson'">
+              € {{ n.net | number:'1.2-2' }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h4 class="mt">Regolazioni suggerite</h4>
+      <ul>
+        <li *ngFor="let s of settlements()">
+          {{ s.from }} → {{ s.to }}: € {{ s.amount | number:'1.2-2' }}
+        </li>
+      </ul>
+
+      <p *ngIf="!nets().length" class="muted mt">Nessun movimento.</p>
+    </div>

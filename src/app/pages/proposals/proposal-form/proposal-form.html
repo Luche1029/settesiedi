@@ -5,6 +5,10 @@
   <form [formGroup]="form">
     <div class="form-row cols-2">
       <div>
+        <label for="proposalDate">Data proposta</label>
+        <input id="proposalDate" class="input" type="date" formControlName="proposalDate" />
+      </div>
+      <div>
         <label for="title">Titolo</label>
         <input id="title" class="input" formControlName="title" placeholder="Es. Pranzo del mercoledì" />
       </div>

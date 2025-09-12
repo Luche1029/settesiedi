@@ -20,10 +20,52 @@ export class ProposalForm implements OnInit {
   private auth = inject(AuthService);
 
   form: FormGroup = this.fb.group({
-    title: ['', [Validators.required, Validators.minLength(3)]],
+    proposalDate: ['', [Validators.required]],   // <-- prima era title
+    title: [''],
     notes: [''],
     items: this.fb.array([])
   });
+
+  private async loadDraft(id: string) {
+    this.loading = true;
+    try {
+      const data = await this.svc.getWithItems(id);
+      this.form.patchValue({
+        proposalDate: data.proposal_date,        // <-- usa la data
+        notes: data.notes ?? ''
+      });
+      this.items.clear();
+      (data.proposal_item || []).forEach((it: any) => this.addItem(it.name, it.notes));
+    } finally { this.loading = false; }
+  }
+
+  async saveDraft() {
+    if (!this.user()) { this.message = 'Non sei loggato.'; return; }
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+
+    const payload = {
+      proposalDate: this.form.value.proposalDate,
+      title: this.form.value.title || '',
+      notes: this.form.value.notes || '',
+      items: (this.form.value.items || []).map((it: any) => ({ name: it.name, notes: it.notes || '' }))
+    };
+    this.loading = true; this.message = '';
+      try {
+        if (this.proposalId) {
+          await this.svc.updateDraft(this.proposalId, payload);
+        } else {
+          const p = await this.svc.createDraft(this.user()!.id, payload);
+          this.proposalId = p.id;
+        }
+        this.message = 'Bozza salvata ✅';
+        this.router.navigateByUrl('/proposals');
+
+      } catch (e:any) {
+        this.message = e.message ?? 'Errore salvataggio';
+      } finally {
+        this.loading = false;
+      }
+  }
 
   loading = false;
   message = '';
@@ -41,20 +83,7 @@ export class ProposalForm implements OnInit {
     if (this.items.length === 0) this.addItem(); // almeno una riga pronta
   }
 
-  private async loadDraft(id: string) {
-    this.loading = true;
-    try {
-      const data = await this.svc.getWithItems(id);
-      this.form.patchValue({ title: data.title, notes: data.notes ?? '' });
-      this.items.clear();
-      (data.proposal_item || []).forEach((it: any) => this.addItem(it.name, it.notes));
-    } catch (e: any) {
-      this.message = e.message ?? 'Errore caricamento';
-    } finally {
-      this.loading = false;
-    }
-  }
-
+ 
   addItem(name = '', notes = '') {
     this.items.push(
       this.fb.group({
@@ -69,32 +98,7 @@ export class ProposalForm implements OnInit {
     if (this.items.length === 0) this.addItem();
   }
 
-  async saveDraft() {
-    if (!this.user()) { this.message = 'Non sei loggato.'; return; }
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
-
-    const payload = {
-      title: this.form.value.title,
-      notes: this.form.value.notes || '',
-      items: (this.form.value.items || []).map((it: any) => ({ name: it.name, notes: it.notes || '' }))
-    };
-
-    this.loading = true; this.message = '';
-    try {
-      if (this.proposalId) {
-        await this.svc.updateDraft(this.proposalId, payload);
-      } else {
-        const p = await this.svc.createDraft(this.user()!.id, payload);
-        this.proposalId = p.id;
-      }
-      this.message = 'Bozza salvata ✅';
-    } catch (e:any) {
-      this.message = e.message ?? 'Errore salvataggio';
-    } finally {
-      this.loading = false;
-    }
-  }
-
+  
   async submit() {
     if (!this.proposalId) { await this.saveDraft(); }
     if (!this.proposalId) return; // se fallito il salvataggio

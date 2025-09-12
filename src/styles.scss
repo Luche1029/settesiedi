@@ -6,13 +6,13 @@
    
 /* -------- Palette (dalla tua insegna) -------- */
 :root {
-  --col-bg:        #F5F0E6; /* panna */
-  --col-card:      #FFF7E0; /* giallo chiaro */
-  --col-ocra:      #E3B756; /* accento primario */
-  --col-marrone:   #d3c5ba; /* bordi/testi scuri */
-  --col-rosso:     #B13A2F; /* azione/danger */
-  --col-text:      #292727; /* testo principale */
-  --col-muted:     #6f604f; /* testo secondario */
+  --col-bg:        #099bf0; /* panna */
+  --col-card:      #689793; /* giallo chiaro */
+  --col-accent:    #2279b3; /* accento primario */
+  --col-borders:   #010a24; /* bordi/testi scuri */
+  --col-danger:    #962217; /* azione/danger */
+  --col-text:      #0a0425; /* testo principale */
+  --col-muted:     #8686a8; /* testo secondario */
 
   --radius: 14px;
   --radius-sm: 10px;
@@ -27,9 +27,9 @@
 /* -------- SCSS variables (facili da riusare) -------- */
 $bg:        var(--col-bg);
 $card:      var(--col-card);
-$ocra:      var(--col-ocra);
-$marrone:   var(--col-marrone);
-$rosso:     var(--col-rosso);
+$accent:    var(--col-accent);
+$borders:   var(--col-borders);
+$danger:    var(--col-danger);
 $text:      var(--col-text);
 $muted:     var(--col-muted);
 
@@ -65,14 +65,14 @@ body {
 /* -------- Card -------- */
 .card {
   background: $card;
-  border: 2px solid $marrone;
+  border: 2px solid $borders;
   border-radius: $radius;
   padding: calc($gap * .9);
   box-shadow: $shadow;
 }
 
 /* -------- Tipografia -------- */
-h1, h2, h3 { color: $marrone; margin: .2em 0 .4em; font-weight: 800; letter-spacing: .2px; }
+h1, h2, h3 { color: $borders; margin: .2em 0 .4em; font-weight: 800; letter-spacing: .2px; }
 h1 { font-size: clamp(1.6rem, 2vw + 1rem, 2.2rem); }
 h2 { font-size: clamp(1.3rem, 1.6vw + .9rem, 1.6rem); }
 h3 { font-size: clamp(1.1rem, 1.2vw + .8rem, 1.3rem); }
@@ -82,92 +82,92 @@ small, .muted { color: $muted; }
 /* -------- Buttons -------- */
 .btn {
   @include pressable; @include focusable;
-  appearance: none; border: 2px solid $marrone; border-radius: $radius-sm;
-  padding: 10px 14px; font-weight: 700; cursor: pointer; background: $ocra; color: $marrone;
+  appearance: none; border: 2px solid $borders; border-radius: $radius-sm;
+  padding: 10px 14px; font-weight: 700; cursor: pointer; background: $accent; color: $borders;
 }
 .btn:hover { filter: contrast(1.05) saturate(1.02); }
-.btn.secondary { background: $card; color: $marrone; }
-.btn.ghost { background: transparent; border-color: $marrone; color: $marrone; }
-.btn.danger { background: $rosso; color: #fff; border-color: darken(#B13A2F, 6%); }
+.btn.secondary { background: $card; color: $borders; }
+.btn.ghost { background: transparent; border-color: $borders; color: $borders; }
+.btn.danger { background: $danger; color: #fff; border-color: darken(#B13A2F, 6%); }
 
 /* -------- Inputs / Forms -------- */
 .input, input[type="text"], input[type="email"], input[type="number"], textarea, select {
-  width: 100%; background: #fff; border: 2px solid $marrone; border-radius: $radius-sm;
+  width: 100%; background: #fff; border: 2px solid $borders; border-radius: $radius-sm;
   padding: 10px 12px; color: $text; font-size: 1rem;
   @include focusable;
 }
-label { font-weight: 700; color: $marrone; display: block; margin-bottom: 6px; }
+label { font-weight: 700; color: $borders; display: block; margin-bottom: 6px; }
 .form-row { display: grid; gap: $gap; grid-template-columns: 1fr; }
 @media (min-width: 720px) { .form-row.cols-2 { grid-template-columns: 1fr 1fr; } .form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; } }
 
 /* -------- Topbar -------- */
 .topbar {
   position: sticky; top: 0; z-index: 10;
-  background: $marrone; color: $bg; border-bottom: 4px solid $ocra;
+  background: $borders; color: $bg; border-bottom: 4px solid $accent;
   display: flex; align-items: center; gap: $gap; padding: 10px clamp(12px, 2vw, 24px);
 }
-.topbar .logo { font-weight: 900; letter-spacing: .5px; color: $ocra; }
+.topbar .logo { font-weight: 900; letter-spacing: .5px; color: $accent; }
 .topbar a { color: $bg; text-decoration: none; font-weight: 700; padding: 6px 10px; border-radius: $radius-sm; }
 .topbar a:hover { background: rgba(255,255,255,.08); }
 
 /* -------- Bottom Nav (mobile) -------- */
 .bottom-nav {
-  position: sticky; bottom: 0; background: $ocra; border-top: 3px solid $marrone;
+  position: sticky; bottom: 0; background: $accent; border-top: 3px solid $borders;
   display: grid; grid-template-columns: repeat(4, 1fr); text-align: center;
 }
-.bottom-nav a { color: $marrone; font-weight: 800; padding: 10px 6px; text-decoration: none; }
+.bottom-nav a { color: $borders; font-weight: 800; padding: 10px 6px; text-decoration: none; }
 .bottom-nav a.active { background: $card; }
 
 /* -------- Tabs -------- */
-.tabs { display: flex; gap: 6px; border-bottom: 3px solid $marrone; margin: 8px 0 14px; }
+.tabs { display: flex; gap: 6px; border-bottom: 3px solid $borders; margin: 8px 0 14px; }
 .tabs button {
   @include pressable; @include focusable;
-  background: $card; color: $marrone; border: 2px solid $marrone; border-bottom: none;
+  background: $card; color: $borders; border: 2px solid $borders; border-bottom: none;
   border-top-left-radius: $radius-sm; border-top-right-radius: $radius-sm;
   padding: 8px 12px; font-weight: 800; cursor: pointer;
 }
-.tabs button.active { background: $ocra; }
+.tabs button.active { background: $accent; }
 
 /* -------- Badge -------- */
 .badge {
-  display: inline-block; padding: 4px 10px; border: 2px solid $marrone; border-radius: 999px;
-  font-weight: 800; color: $marrone; background: $card;
+  display: inline-block; padding: 4px 10px; border: 2px solid $borders; border-radius: 999px;
+  font-weight: 800; color: $borders; background: $card;
 }
-.badge.ocra { background: $ocra; }
-.badge.marrone { background: $marrone; color: #fff; }
+.badge.ocra { background: $accent; }
+.badge.marrone { background: $borders; color: #fff; }
 
 /* -------- RSVP Toggles -------- */
 .rsvp-toggle { display: inline-flex; gap: 6px; }
 .rsvp-toggle .pill {
   @include pressable; @include focusable;
-  padding: 8px 12px; border: 2px solid $marrone; border-radius: 999px; cursor: pointer; background: $card; color: $marrone; font-weight: 800;
+  padding: 8px 12px; border: 2px solid $borders; border-radius: 999px; cursor: pointer; background: $card; color: $borders; font-weight: 800;
 }
-.rsvp-toggle .pill.active { background: $ocra; }
+.rsvp-toggle .pill.active { background: $accent; }
 .rsvp-going  { background: #6d8b3f; color: #fff; border-color: darken(#6d8b3f, 8%); }
-.rsvp-maybe  { background: $ocra; color: $marrone; }
-.rsvp-no     { background: $rosso; color: #fff; border-color: darken(#B13A2F, 8%); }
+.rsvp-maybe  { background: $accent; color: $borders; }
+.rsvp-no     { background: $danger; color: #fff; border-color: darken(#B13A2F, 8%); }
 
 /* -------- Event Card -------- */
 .event-card {
   @extend .card;
   display: grid; gap: 10px;
 }
-.event-card .title { font-size: 1.15rem; font-weight: 900; color: $marrone; }
+.event-card .title { font-size: 1.15rem; font-weight: 900; color: $borders; }
 .event-card .meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .event-card .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
 /* -------- Tables (spese/bilanci) -------- */
 .table {
   width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; border-radius: $radius;
-  border: 2px solid $marrone; background: $card;
+  border: 2px solid $borders; background: $card;
 }
 .table th, .table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid rgba(0,0,0,.06); }
-.table th { background: $ocra; color: $marrone; font-weight: 900; }
+.table th { background: $accent; color: $borders; font-weight: 900; }
 .table tr:last-child td { border-bottom: none; }
 
 /* -------- Toast / Alert -------- */
 .toast {
-  position: fixed; right: 16px; bottom: 16px; background: $marrone; color: $bg; border: 2px solid $ocra;
+  position: fixed; right: 16px; bottom: 16px; background: $borders; color: $bg; border: 2px solid $accent;
   padding: 10px 14px; border-radius: $radius; box-shadow: $shadow; z-index: 100;
 }
 
