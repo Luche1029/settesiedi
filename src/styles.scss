@@ -1,1 +1,202 @@
-/* You can add global styles to this file, and also import other style files */
+/* =========================
+   7siedi – Global SCSS Theme
+   Paste into: src/styles.scss
+   ========================= */
+
+   
+/* -------- Palette (dalla tua insegna) -------- */
+:root {
+  --col-bg:        #F5F0E6; /* panna */
+  --col-card:      #FFF7E0; /* giallo chiaro */
+  --col-ocra:      #E3B756; /* accento primario */
+  --col-marrone:   #4B2C14; /* bordi/testi scuri */
+  --col-rosso:     #B13A2F; /* azione/danger */
+  --col-text:      #1A1A1A; /* testo principale */
+  --col-muted:     #6f604f; /* testo secondario */
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 20px;
+
+  --gap: 16px;
+  --shadow: 0 6px 18px rgba(0,0,0,.08);
+
+  --focus: 0 0 0 3px rgba(227,183,86,.45); /* ocra soft */
+}
+
+/* -------- SCSS variables (facili da riusare) -------- */
+$bg:        var(--col-bg);
+$card:      var(--col-card);
+$ocra:      var(--col-ocra);
+$marrone:   var(--col-marrone);
+$rosso:     var(--col-rosso);
+$text:      var(--col-text);
+$muted:     var(--col-muted);
+
+$radius:    var(--radius);
+$radius-sm: var(--radius-sm);
+$radius-lg: var(--radius-lg);
+$gap:       var(--gap);
+$shadow:    var(--shadow);
+$focus:     var(--focus);
+
+/* -------- Reset leggero -------- */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  background: $bg;
+  color: $text;
+  line-height: 1.4;
+}
+
+/* Utilità */
+.container { width: min(1100px, 92vw); margin-inline: auto; padding: calc($gap * 1.2) 0; }
+.grid { display: grid; gap: $gap; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.flex { display: flex; gap: $gap; }
+.center { display: grid; place-items: center; }
+.mt { margin-top: $gap; } .mb { margin-bottom: $gap; } .ml { margin-left: $gap; } .mr { margin-right: $gap; }
+
+/* Mixin */
+@mixin pressable { transition: transform .06s ease, filter .2s ease; &:active { transform: translateY(1px) scale(.997); } }
+@mixin focusable { outline: none; box-shadow: none; &:focus-visible { box-shadow: $focus; } }
+
+/* -------- Card -------- */
+.card {
+  background: $card;
+  border: 2px solid $marrone;
+  border-radius: $radius;
+  padding: calc($gap * .9);
+  box-shadow: $shadow;
+}
+
+/* -------- Tipografia -------- */
+h1, h2, h3 { color: $marrone; margin: .2em 0 .4em; font-weight: 800; letter-spacing: .2px; }
+h1 { font-size: clamp(1.6rem, 2vw + 1rem, 2.2rem); }
+h2 { font-size: clamp(1.3rem, 1.6vw + .9rem, 1.6rem); }
+h3 { font-size: clamp(1.1rem, 1.2vw + .8rem, 1.3rem); }
+p, small { color: $text; }
+small, .muted { color: $muted; }
+
+/* -------- Buttons -------- */
+.btn {
+  @include pressable; @include focusable;
+  appearance: none; border: 2px solid $marrone; border-radius: $radius-sm;
+  padding: 10px 14px; font-weight: 700; cursor: pointer; background: $ocra; color: $marrone;
+}
+.btn:hover { filter: contrast(1.05) saturate(1.02); }
+.btn.secondary { background: $card; color: $marrone; }
+.btn.ghost { background: transparent; border-color: $marrone; color: $marrone; }
+.btn.danger { background: $rosso; color: #fff; border-color: darken(#B13A2F, 6%); }
+
+/* -------- Inputs / Forms -------- */
+.input, input[type="text"], input[type="email"], input[type="number"], textarea, select {
+  width: 100%; background: #fff; border: 2px solid $marrone; border-radius: $radius-sm;
+  padding: 10px 12px; color: $text; font-size: 1rem;
+  @include focusable;
+}
+label { font-weight: 700; color: $marrone; display: block; margin-bottom: 6px; }
+.form-row { display: grid; gap: $gap; grid-template-columns: 1fr; }
+@media (min-width: 720px) { .form-row.cols-2 { grid-template-columns: 1fr 1fr; } .form-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; } }
+
+/* -------- Topbar -------- */
+.topbar {
+  position: sticky; top: 0; z-index: 10;
+  background: $marrone; color: $bg; border-bottom: 4px solid $ocra;
+  display: flex; align-items: center; gap: $gap; padding: 10px clamp(12px, 2vw, 24px);
+}
+.topbar .logo { font-weight: 900; letter-spacing: .5px; color: $ocra; }
+.topbar a { color: $bg; text-decoration: none; font-weight: 700; padding: 6px 10px; border-radius: $radius-sm; }
+.topbar a:hover { background: rgba(255,255,255,.08); }
+
+/* -------- Bottom Nav (mobile) -------- */
+.bottom-nav {
+  position: sticky; bottom: 0; background: $ocra; border-top: 3px solid $marrone;
+  display: grid; grid-template-columns: repeat(4, 1fr); text-align: center;
+}
+.bottom-nav a { color: $marrone; font-weight: 800; padding: 10px 6px; text-decoration: none; }
+.bottom-nav a.active { background: $card; }
+
+/* -------- Tabs -------- */
+.tabs { display: flex; gap: 6px; border-bottom: 3px solid $marrone; margin: 8px 0 14px; }
+.tabs button {
+  @include pressable; @include focusable;
+  background: $card; color: $marrone; border: 2px solid $marrone; border-bottom: none;
+  border-top-left-radius: $radius-sm; border-top-right-radius: $radius-sm;
+  padding: 8px 12px; font-weight: 800; cursor: pointer;
+}
+.tabs button.active { background: $ocra; }
+
+/* -------- Badge -------- */
+.badge {
+  display: inline-block; padding: 4px 10px; border: 2px solid $marrone; border-radius: 999px;
+  font-weight: 800; color: $marrone; background: $card;
+}
+.badge.ocra { background: $ocra; }
+.badge.marrone { background: $marrone; color: #fff; }
+
+/* -------- RSVP Toggles -------- */
+.rsvp-toggle { display: inline-flex; gap: 6px; }
+.rsvp-toggle .pill {
+  @include pressable; @include focusable;
+  padding: 8px 12px; border: 2px solid $marrone; border-radius: 999px; cursor: pointer; background: $card; color: $marrone; font-weight: 800;
+}
+.rsvp-toggle .pill.active { background: $ocra; }
+.rsvp-going  { background: #6d8b3f; color: #fff; border-color: darken(#6d8b3f, 8%); }
+.rsvp-maybe  { background: $ocra; color: $marrone; }
+.rsvp-no     { background: $rosso; color: #fff; border-color: darken(#B13A2F, 8%); }
+
+/* -------- Event Card -------- */
+.event-card {
+  @extend .card;
+  display: grid; gap: 10px;
+}
+.event-card .title { font-size: 1.15rem; font-weight: 900; color: $marrone; }
+.event-card .meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.event-card .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* -------- Tables (spese/bilanci) -------- */
+.table {
+  width: 100%; border-collapse: separate; border-spacing: 0; overflow: hidden; border-radius: $radius;
+  border: 2px solid $marrone; background: $card;
+}
+.table th, .table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid rgba(0,0,0,.06); }
+.table th { background: $ocra; color: $marrone; font-weight: 900; }
+.table tr:last-child td { border-bottom: none; }
+
+/* -------- Toast / Alert -------- */
+.toast {
+  position: fixed; right: 16px; bottom: 16px; background: $marrone; color: $bg; border: 2px solid $ocra;
+  padding: 10px 14px; border-radius: $radius; box-shadow: $shadow; z-index: 100;
+}
+
+/* -------- Helpers component-specific suggeriti -------- */
+/* Login */
+.login-box { @extend .card; max-width: 420px; margin: 8vh auto; text-align: center; }
+.login-box .input { margin: 10px 0; }
+
+/* Menu Detail layout */
+.menu-detail {
+  display: grid; gap: $gap;
+  @media (min-width: 960px) { grid-template-columns: 2fr 1fr; align-items: start; }
+}
+.menu-summary { @extend .card; }
+
+/* Expense form */
+.expense-form { @extend .card; }
+.expense-form .row { @extend .form-row; }
+
+/* -------- Dark Mode (opzionale) -------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --col-bg:        #2a251f;
+    --col-card:      #3b332a;
+    --col-text:      #f3ece0;
+    --col-muted:     #d2c6b5;
+  }
+  .topbar a { color: var(--col-bg); }
+  .table th { color: #332312; }
+}
+
+/* ===== End Theme ===== */

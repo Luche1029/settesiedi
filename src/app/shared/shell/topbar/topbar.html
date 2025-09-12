@@ -1,0 +1,23 @@
+<header class="topbar">
+  <div class="logo">7siedi</div>
+
+  <nav class="flex" style="gap:12px">
+    <a routerLink="/menus" routerLinkActive="active">Menù</a>
+    <a routerLink="/proposals" routerLinkActive="active">Proposte</a>
+    <a routerLink="/expenses" routerLinkActive="active">Spese</a>
+    <a routerLink="/balances" routerLinkActive="active">Bilanci</a>
+  </nav>
+
+  <div class="spacer" style="flex:1"></div>
+
+  <div class="flex" style="gap:10px; align-items:center;">
+    <span *ngIf="user(); else guest" class="badge marrone">
+      {{ user()?.display_name || user()?.name }}
+    </span>
+    <ng-template #guest>
+      <span class="badge">Ospite</span>
+    </ng-template>
+
+    <button *ngIf="user()" class="btn secondary" (click)="logout()">Esci</button>
+  </div>
+</header>
