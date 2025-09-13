@@ -123,4 +123,47 @@ export class ProposalService {
     }
     return newProp;
   }
+
+   /** Proposte da revisionare: default solo 'submitted' (e opz. 'draft' se vuoi) */
+  async listForReview(includeDraft = false) {
+    let q = supabase
+      .from('proposal')
+      .select('id, user_id, proposal_date, notes, status, created_at, app_user:user_id(display_name), proposal_item(count)')
+      .order('created_at', { ascending: false });
+
+    if (includeDraft) {
+      q = q.in('status', ['submitted','draft']);
+    } else {
+      q = q.eq('status', 'submitted');
+    }
+
+    const { data, error } = await q;
+    if (error) throw error;
+    return (data || []).map((r: any) => ({
+      ...r,
+      itemsCount: r.proposal_item?.[0]?.count ?? 0,
+      proposerName: r.app_user?.display_name ?? '—'
+    }));
+  }
+
+  /** Approva la proposta e crea l'evento (RPC) */
+  async approve(proposalId: string, eventDate: string, creatorId?: string): Promise<string> {
+    const { data, error } = await supabase.rpc('approve_proposal', {
+      p_proposal: proposalId,
+      p_event_date: eventDate,
+      p_creator: creatorId ?? null
+    });
+    if (error) throw error;
+    return data as string; // event id
+  }
+
+  /** Rifiuta la proposta */
+  async reject(proposalId: string) {
+    const { error } = await supabase
+      .from('proposal')
+      .update({ status: 'rejected' })
+      .eq('id', proposalId);
+    if (error) throw error;
+    return true;
+  }
 }

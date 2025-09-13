@@ -6,6 +6,15 @@
     <a routerLink="/proposals" routerLinkActive="active">Proposte</a>
     <a routerLink="/expenses" routerLinkActive="active">Spese</a>
     <a routerLink="/balances" routerLinkActive="active">Bilanci</a>
+    <a>Admin
+       <ul>
+        <li><a routerLink="/proposals/review" routerLinkActive="active">Gestisci proposte</a></li>
+        <li><a routerLink="/events/admin" routerLinkActive="active">Gestisci menù</a></li>
+
+      </ul>
+    </a>
+   
+    
   </nav>
 
   <div class="spacer" style="flex:1"></div>
@@ -20,4 +29,5 @@
 
     <button *ngIf="user()" class="btn secondary" (click)="logout()">Esci</button>
   </div>
+  
 </header>

@@ -84,4 +84,54 @@ export class EventService {
     return data;
     }
 
+  async listAdmin(startISO?: string, endISO?: string, includeArchived = false) {
+    let q = supabase
+      .from('event')
+      .select('id, event_date, title, notes, archived, created_at, source_proposal_id, app_user:created_by(display_name)')
+      .order('event_date', { ascending: true });
+
+    if (startISO) q = q.gte('event_date', startISO);
+    if (endISO)   q = q.lte('event_date', endISO);
+    if (!includeArchived) q = q.eq('archived', false);
+
+    const { data, error } = await q;
+    if (error) throw error;
+    return (data || []).map((e: any) => ({
+      ...e,
+      creator_name: e.app_user?.display_name ?? '—'
+    }));
+  }
+
+  async updateDate(eventId: string, newDate: string) {
+    const { error } = await supabase
+      .from('event')
+      .update({ event_date: newDate })
+      .eq('id', eventId);
+    if (error) throw error;
+    return true;
+  }
+
+  async setArchived(eventId: string, archived: boolean) {
+    const { error } = await supabase
+      .from('event')
+      .update({ archived })
+      .eq('id', eventId);
+    if (error) throw error;
+    return true;
+  }
+
+  async remove(eventId: string) {
+    const { error } = await supabase.from('event').delete().eq('id', eventId);
+    if (error) throw error;
+    return true;
+  }
+
+  async revertApproval(eventId: string, force = false) {
+    const { error } = await supabase.rpc('revert_approval', {
+      p_event: eventId,
+      p_force: force
+    });
+    if (error) throw error;
+    return true;
+  }
 }

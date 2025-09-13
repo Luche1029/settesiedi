@@ -1,1 +1,70 @@
-<p>events-admin works!</p>
+<div class="card">
+  <div class="flex" style="align-items:center; justify-content:space-between;">
+    <h2>Gestione eventi</h2>
+    <div class="flex" style="gap:8px; align-items:center;">
+      <label>Da</label>
+      <input class="input" type="date" [value]="startISO()" (change)="setStart($any($event.target).value)" />
+      <label>A</label>
+      <input class="input" type="date" [value]="endISO()" (change)="setEnd($any($event.target).value)" />
+      <label class="badge" style="cursor:pointer;">
+        <input type="checkbox" [checked]="includeArchived()" (change)="includeArchived.set($any($event.target).checked); load()" />
+        Mostra archiviati
+      </label>
+      <button class="btn secondary" (click)="load()">Ricarica</button>
+    </div>
+  </div>
+
+  <p *ngIf="message()" class="mt">{{ message() }}</p>
+  <p *ngIf="loading()" class="mt muted">Caricamento…</p>
+
+  <div class="grid mt" *ngIf="!loading()">
+    <div class="event-card" *ngFor="let e of rows()">
+      <div class="title">
+        {{ e.title || (e.event_date | date:'EEEE d MMMM y') }}
+      </div>
+      <small class="muted">
+        Creato da: {{ e.creator_name }} • {{ e.created_at | date:'short' }}
+        <span *ngIf="e.source_proposal_id"> • da proposal {{ e.source_proposal_id | slice:0:8 }}…</span>
+      </small>
+
+      <div class="meta mt">
+        <span class="badge" [class.marrone]="e.archived">Stato: {{ e.archived ? 'archiviato' : 'attivo' }}</span>
+      </div>
+
+      <div class="form-row cols-3 mt">
+        <div>
+          <label>Data evento</label>
+          <input class="input" type="date"
+                 [value]="editDate.get(e.id) || e.event_date"
+                 (change)="setDate(e.id, $any($event.target).value)" />
+        </div>
+        <div class="center">
+          <button class="btn" (click)="saveDate(e)">Salva data</button>
+        </div>
+        <div class="center">
+          <button class="btn secondary" (click)="open(e)">Apri</button>
+        </div>
+      </div>
+
+      <div class="actions mt">
+        <button class="btn" (click)="archive(e, !e.archived)">
+          {{ e.archived ? 'Ripristina' : 'Archivia' }}
+        </button>
+
+        <label class="badge" style="cursor:pointer;">
+          <input type="checkbox"
+                 [checked]="forceRevert.get(e.id) || false"
+                 (change)="toggleForce(e.id, $any($event.target).checked)" />
+          Forza revert
+        </label>
+        <button class="btn danger" (click)="revert(e)">Revert approval</button>
+
+        <button class="btn danger" (click)="remove(e)">Elimina</button>
+      </div>
+    </div>
+  </div>
+
+  <p *ngIf="!loading() && rows().length === 0" class="mt muted">
+    Nessun evento nel periodo selezionato.
+  </p>
+</div>

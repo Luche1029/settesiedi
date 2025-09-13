@@ -1,1 +1,45 @@
-<p>proposals-review works!</p>
+<div class="card">
+  <div class="flex" style="align-items:center; justify-content:space-between;">
+    <h2>Revisione proposte</h2>
+    <div class="flex" style="gap:8px">
+      <label class="badge" style="cursor:pointer;">
+        <input type="checkbox" [checked]="includeDraft()" (change)="toggleDraft()" />
+        Includi bozze
+      </label>
+      <button class="btn secondary" (click)="load()">Ricarica</button>
+    </div>
+  </div>
+
+  <p *ngIf="message()" class="mt">{{ message() }}</p>
+  <p *ngIf="loading()" class="mt muted">Caricamento…</p>
+
+  <div class="grid mt" *ngIf="!loading()">
+    <div class="event-card" *ngFor="let p of rows()">
+      <div class="title">
+        {{ p.proposal_date | date:'EEEE d MMMM y' }}
+      </div>
+      <small class="muted">Proposto da: {{ p.proposerName }} • {{ p.created_at | date:'short' }}</small>
+
+      <div class="meta mt">
+        <span class="badge">Stato: {{ p.status }}</span>
+        <span class="badge ocra">{{ p.itemsCount }} piatti</span>
+      </div>
+
+      <p *ngIf="p.notes" class="mt">{{ p.notes }}</p>
+
+        <div class="form-row cols-2 mt">
+        <div class="center">
+          <button class="btn" (click)="approve(p)">Approva</button>
+        </div>
+        <div class="center">
+          <button class="btn danger" (click)="reject(p)">Rifiuta</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <p *ngIf="!loading() && rows().length === 0" class="mt muted">
+    Nessuna proposta da revisionare.
+  </p>
+</div>
