@@ -14,8 +14,8 @@
       <section [ngSwitch]="tab" class="mt">
         <app-event-items   *ngSwitchCase="'items'" [eventId]="eventId" [items]="event()?.event_item || []"></app-event-items>
         <app-reservations  *ngSwitchCase="'rsvp'"  [eventId]="eventId"></app-reservations>
-        <app-expenses      *ngSwitchCase="'exp'"   [eventId]="eventId"></app-expenses>
-        <app-balances      *ngSwitchCase="'bal'"   [eventId]="eventId"></app-balances>
+        <app-expenses      *ngSwitchCase="'exp'"></app-expenses>
+        <app-balances      *ngSwitchCase="'bal'"></app-balances>
       </section>
     </div>
   </div>

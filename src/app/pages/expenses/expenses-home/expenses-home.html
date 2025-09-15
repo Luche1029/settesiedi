@@ -1,0 +1,43 @@
+<div class="card">
+  <h2>Spese</h2>
+
+  <div class="form-row cols-3">
+    <div>
+      <label>Da</label>
+      <input class="input" type="date"
+             [ngModel]="from()"
+             (ngModelChange)="from.set($event)" />
+    </div>
+    <div>
+      <label>A</label>
+      <input class="input" type="date"
+             [ngModel]="to()"
+             (ngModelChange)="to.set($event)" />
+    </div>
+    <div class="center">
+      <button class="btn" (click)="refresh()">Aggiorna</button>
+    </div>
+  </div>
+
+  <div class="mt">
+    <span class="badge ocra">Totale: € {{ total() | number:'1.2-2' }}</span>
+    <button class="btn ml" [routerLink]="['/expenses/new']">+ Nuova spesa</button>
+    <button class="btn secondary ml" [routerLink]="['/expenses/list']">Vedi elenco</button>
+    <button class="btn secondary ml" [routerLink]="['/expenses/balances']">Bilanci</button>
+  </div>
+
+  <table class="table mt" *ngIf="perPayer().length">
+    <thead>
+      <tr><th>Pagatore</th><th>Totale</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of perPayer()">
+        <td>{{ p.display_name }}</td>
+        <td>€ {{ p.total | number:'1.2-2' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="msg()" class="mt">{{ msg() }}</p>
+  <p *ngIf="loading()" class="mt muted">Caricamento…</p>
+</div>

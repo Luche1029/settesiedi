@@ -1,0 +1,22 @@
+<div class="card" *ngIf="row()">
+  <h2>{{ row()?.description }} • € {{ row()?.amount | number:'1.2-2' }}</h2>
+  <small class="muted">
+    {{ row()?.expense_date | date:'mediumDate' }}
+    — Pagato da {{ row()?.payer_name }}
+    — Stato: {{ row()?.status }}
+  </small>
+
+  <div class="mt">
+    <span class="badge">Iscritti: {{ row()?.participants_count || 0 }}</span>
+    <ul class="mt" *ngIf="row()?.participants_names?.length">
+      <li *ngFor="let n of row()?.participants_names">{{ n }}</li>
+    </ul>
+  </div>
+
+  <div class="mt">
+    <button class="btn" (click)="join()" *ngIf="!joined()">Iscrivimi</button>
+    <button class="btn secondary" (click)="leave()" *ngIf="joined()">Rimuovimi</button>
+    <button class="btn ghost ml" (click)="lock()" *ngIf="canLock">Blocca</button>
+    <button class="btn danger ml" (click)="voidExpense()" *ngIf="canVoid">Annulla</button>
+  </div>
+</div>

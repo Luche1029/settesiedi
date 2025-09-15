@@ -14,7 +14,24 @@
     <div class="event-card" *ngFor="let ev of items()">
       <div class="title">{{ ev.event_date | date:'EEEE d MMMM' }}</div>
       <div class="meta">
-        <span class="badge">Partecipanti: {{ ev.participants }}</span>
+        <!-- Badge cliccabile -->
+        <div class="badge" style="position:relative; cursor:pointer;"
+            (click)="toggle(ev.id)"
+            (mouseenter)="toggle(ev.id)" (mouseleave)="close()">
+          Partecipanti: {{ ev.participants }}
+
+          <!-- Popover -->
+          <div *ngIf="openFor() === ev.id"
+              class="card"
+              style="position:absolute; left:0; top:calc(100% + 8px); z-index:20; min-width:220px; padding:10px;">
+            <strong class="muted">Iscritti</strong>
+            <ul style="margin:8px 0 0; padding:0 0 0 16px;">
+              <li *ngFor="let n of (ev.participantsNames || namesMap()[ev.id] || [])">{{ n }}</li>
+              <li *ngIf="!(ev.participantsNames?.length) && !(namesMap()[ev.id]?.length)" class="muted">Nessuno</li>
+            </ul>
+          </div>
+        </div>
+
         <span class="badge ocra">Totale spese: € {{ ev.total | number:'1.2-2' }}</span>
       </div>
       <p *ngIf="ev.notes" class="mt">{{ ev.notes }}</p>

@@ -1,0 +1,29 @@
+<div class="card">
+  <h2>Nuova spesa</h2>
+  <div class="form-row cols-2">
+    <div>
+      <label>Descrizione</label>
+      <input class="input" [(ngModel)]="description" placeholder="Es. spesa supermercato" />
+    </div>
+    <div>
+      <label>Importo (€)</label>
+      <input class="input" type="number" step="0.01" [(ngModel)]="amount" />
+    </div>
+    <div>
+      <label>Data</label>
+      <input class="input" type="date" [(ngModel)]="expense_date" />
+    </div>
+    <div>
+      <label>Note</label>
+      <input class="input" [(ngModel)]="notes" />
+    </div>
+    <label class="badge" style="width:max-content;">
+      <input type="checkbox" [(ngModel)]="include_payer" />
+      Includi anche me nella divisione
+    </label>
+    <div class="center">
+      <button class="btn" (click)="save()">Salva</button>
+    </div>
+  </div>
+  <p *ngIf="msg" class="mt">{{ msg }}</p>
+</div>

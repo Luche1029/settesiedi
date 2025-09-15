@@ -11,6 +11,7 @@ export interface EventRow {
 
 export interface EventCardVM extends EventRow {
   participants: number;      // going
+  participantsNames?: string[];
   total: number;             // somma spese €
 }
 
@@ -62,16 +63,19 @@ export class EventService {
   async listByWeekWithStats(startISO: string, endISO: string): Promise<EventCardVM[]> {
     const rows = await this.listByWeek(startISO, endISO);
     const ids = rows.map(r => r.id);
-    const [goingMap, totalMap] = await Promise.all([
+    const [goingMap, totalMap, namesMap] = await Promise.all([
       this.countGoingForEvents(ids),
       this.sumExpensesForEvents(ids),
+      this.getGoingNamesForEvents(ids),
     ]);
     return rows.map(r => ({
       ...r,
       participants: goingMap[r.id] || 0,
       total: Number((totalMap[r.id] || 0).toFixed(2)),
-    }));
+      participantsNames: namesMap[r.id] || []
+    }) as any);
   }
+
 
   // + aggiungi:
     async getWithItems(id: string) {
@@ -134,4 +138,29 @@ export class EventService {
     if (error) throw error;
     return true;
   }
+
+  /** Mappa {event_id -> array di nomi (display_name)} dei partecipanti 'going' */
+  async getGoingNamesForEvents(eventIds: string[]): Promise<Record<string, string[]>> {
+    if (!eventIds.length) return {};
+    const { data, error } = await supabase
+      .from('reservation')
+      .select('event_id, user_id:app_user(display_name), status')
+      .in('event_id', eventIds)
+      .eq('status', 'going');
+
+    if (error) throw error;
+
+    const map: Record<string, string[]> = {};
+    for (const r of (data as any[]) || []) {
+      const name = r.user_id?.display_name ?? '—';
+      (map[r.event_id] ??= []).push(name);
+    }
+
+    // ordina alfabeticamente per estetica
+    Object.keys(map).forEach(k => map[k].sort((a,b)=>a.localeCompare(b)));
+    return map;
+  }
+
+  
+
 }

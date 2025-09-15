@@ -25,6 +25,7 @@ function toISODate(date: Date) {
   templateUrl: './weekly-menus.html'
 })
 export class WeeklyMenus implements OnInit {
+
   private eventsSvc = inject(EventService);
   private rsvpSvc = inject(ReservationService);
   private auth = inject(AuthService);
@@ -38,6 +39,11 @@ export class WeeklyMenus implements OnInit {
   items   = signal<EventCardVM[]>([]);
 
   user = computed(() => this.auth.user());
+
+  openFor = signal<string | null>(null); // eventId con popover aperto
+  toggle(id: string) { this.openFor.set(this.openFor() === id ? null : id); }
+  close() { this.openFor.set(null); }
+
 
   async ngOnInit() {
     this.auth.restore();
@@ -84,4 +90,13 @@ export class WeeklyMenus implements OnInit {
     const fmt = (d: Date) => d.toLocaleDateString(undefined, { day:'2-digit', month:'short' });
     return `${fmt(sd)} → ${fmt(ed)}`;
   }
+
+  namesMap = signal<Record<string, string[]>>({});
+
+  async loadNames(evId: string) {
+    if (this.namesMap()[evId]) return;  // già caricati
+    const map = await this.eventsSvc.getGoingNamesForEvents([evId]);
+    this.namesMap.set({ ...this.namesMap(), ...map });
+  }
+
 }

@@ -1,0 +1,46 @@
+<div class="card">
+  <h2>Bilanci complessivi</h2>
+
+  <div class="form-row cols-3">
+    <div>
+      <label>Da</label>
+      <input class="input" type="date"
+             [ngModel]="from()"
+             (ngModelChange)="from.set($event)" />
+    </div>
+    <div>
+      <label>A</label>
+      <input class="input" type="date"
+             [ngModel]="to()"
+             (ngModelChange)="to.set($event)" />
+    </div>
+    <div class="center">
+      <button class="btn" (click)="refresh()">Aggiorna</button>
+    </div>
+  </div>
+
+  <h3 class="mt">Netti</h3>
+  <table class="table mt" *ngIf="nets().length">
+    <thead>
+      <tr><th>Utente</th><th>Pagato</th><th>Dovuto</th><th>Netto</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let n of nets()">
+        <td>{{ n.display_name }}</td>
+        <td>€ {{ n.paid  | number:'1.2-2' }}</td>
+        <td>€ {{ n.owed  | number:'1.2-2' }}</td>
+        <td>€ {{ n.net   | number:'1.2-2' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 class="mt">Regolazioni “chi deve a chi”</h3>
+  <ul class="mt">
+    <li *ngFor="let s of settlements()">
+      {{ s.from_name }} → {{ s.to_name }}: € {{ s.amount | number:'1.2-2' }}
+    </li>
+  </ul>
+
+  <p *ngIf="msg()" class="mt">{{ msg() }}</p>
+  <p *ngIf="loading()" class="mt muted">Caricamento…</p>
+</div>

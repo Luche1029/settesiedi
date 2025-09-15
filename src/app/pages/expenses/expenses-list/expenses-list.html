@@ -1,0 +1,33 @@
+<div class="card">
+  <h2>Elenco spese</h2>
+  <div class="grid mt">
+    <div class="event-card"
+         *ngFor="let e of rows()"
+         (click)="open(e.id)"
+         style="cursor:pointer;">
+      <div class="title">{{ e.description }} • € {{ e.amount | number:'1.2-2' }}</div>
+      <small class="muted">
+        {{ e.expense_date | date:'mediumDate' }}
+        — Pagato da {{ e.payer_name }}
+        — Stato: {{ e.status }}
+      </small>
+
+      <div class="meta mt">
+        <span class="badge" style="position:relative"
+              (click)="$event.stopPropagation(); toggleNames(e.id)">
+          Iscritti: {{ e.participants_count || 0 }}
+
+          <div class="card"
+               *ngIf="openId()===e.id"
+               style="position:absolute; left:0; top:calc(100% + 8px); min-width:220px;">
+            <strong class="muted">Partecipanti</strong>
+            <ul style="margin:8px 0 0; padding-left:16px;">
+              <li *ngFor="let n of (e.participants_names || [])">{{ n }}</li>
+              <li *ngIf="!(e.participants_names?.length)" class="muted">Nessuno</li>
+            </ul>
+          </div>
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

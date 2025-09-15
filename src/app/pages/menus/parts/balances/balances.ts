@@ -1,8 +1,10 @@
-import { Component, Input, OnInit, inject, signal } from '@angular/core';
+// src/app/pages/menus/parts/balance.ts
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ExpenseService } from '../../../../services/expense.service';
+import { ExpensesService } from '../../../../services/expenses.service';
 
-type Net = { user_id: string; name: string; net: number; };
+type NetRow = { user_id: string; name: string; net: number };
+type SettlementRow = { from: string; to: string; amount: number };
 
 @Component({
   selector: 'app-balances',
@@ -11,52 +13,42 @@ type Net = { user_id: string; name: string; net: number; };
   templateUrl: `./balances.html`
 })
 export class Balances implements OnInit {
-  @Input() eventId!: string;
-  private svc = inject(ExpenseService);
+  private svc = inject(ExpensesService);
 
-  nets = signal<Net[]>([]);
-  settlements = signal<{from:string;to:string;amount:number}[]>([]);
+  nets = signal<NetRow[]>([]);
+  settlements = signal<SettlementRow[]>([]);
   message = signal('');
 
-  async ngOnInit(){
+  async ngOnInit() {
     await this.compute();
   }
 
   async compute() {
+    this.message.set('');
     try {
-      const expenses = await this.svc.listByEvent(this.eventId);
-      // net = pagato - dovuto
-      const map = new Map<string, Net>();
-      for (const e of expenses) {
-        // payer +
-        const pKey = e.user_id;
-        if (!map.has(pKey)) map.set(pKey, { user_id:pKey, name:e.payer_name, net:0 });
-        map.get(pKey)!.net += Number(e.amount||0);
+      // Bilanci complessivi (passo null/null per “tutto”)
+      const [nets, setts] = await Promise.all([
+        this.svc.nets(null, null),          // -> [{ user_id, display_name, paid, owed, net }]
+        this.svc.settlements(null, null)    // -> [{ from_user, from_name, to_user, to_name, amount }]
+      ]);
 
-        // shares -
-        for (const s of e.shares||[]) {
-          const key = s.user_id;
-          if (!map.has(key)) map.set(key, { user_id:key, name:s.name, net:0 });
-          map.get(key)!.net -= Number(s.amount||0);
-        }
-      }
-      const nets = Array.from(map.values()).filter(n => Math.abs(n.net) > 0.001);
-      this.nets.set(nets);
+      // Adattiamo ai tipi attesi dal template (name/net e from/to/amount)
+      const mappedNets: NetRow[] = (nets || []).map((n: any) => ({
+        user_id: n.user_id,
+        name: n.display_name,
+        net: Number(n.net || 0)
+      })).filter((n: { net: number; }) => Math.abs(n.net) > 0.001);
 
-      // greedy settlements
-      const cred = nets.filter(n=>n.net>0).map(n=>({name:n.name, net:+n.net})).sort((a,b)=>b.net-a.net);
-      const debt = nets.filter(n=>n.net<0).map(n=>({name:n.name, net:-n.net})).sort((a,b)=>b.net-a.net);
-      const out: {from:string;to:string;amount:number}[] = [];
-      let i=0,j=0;
-      while(i<debt.length && j<cred.length){
-        const amt = Math.min(debt[i].net, cred[j].net);
-        out.push({ from: debt[i].name, to: cred[j].name, amount: Math.round(amt*100)/100 });
-        debt[i].net -= amt; cred[j].net -= amt;
-        if (debt[i].net < 0.001) i++;
-        if (cred[j].net < 0.001) j++;
-      }
-      this.settlements.set(out);
-    } catch(e:any){
+      const mappedSetts: SettlementRow[] = (setts || []).map((s: any) => ({
+        from: s.from_name,
+        to: s.to_name,
+        amount: Number(s.amount || 0)
+      }));
+
+      this.nets.set(mappedNets);
+      this.settlements.set(mappedSetts);
+
+    } catch (e: any) {
       this.message.set(e.message ?? 'Errore calcolo bilanci');
     }
   }

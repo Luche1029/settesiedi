@@ -6,13 +6,13 @@
     <a routerLink="/proposals" routerLinkActive="active">Proposte</a>
     <a routerLink="/expenses" routerLinkActive="active">Spese</a>
     <a routerLink="/balances" routerLinkActive="active">Bilanci</a>
-    <a>Admin
+    <!--a>Admin
        <ul>
         <li><a routerLink="/proposals/review" routerLinkActive="active">Gestisci proposte</a></li>
         <li><a routerLink="/events/admin" routerLinkActive="active">Gestisci menù</a></li>
 
       </ul>
-    </a>
+    </a-->
    
     
   </nav>
@@ -21,7 +21,7 @@
 
   <div class="flex" style="gap:10px; align-items:center;">
     <span *ngIf="user(); else guest" class="badge marrone">
-      {{ user()?.display_name || user()?.name }}
+      {{ user()?.display_name }}
     </span>
     <ng-template #guest>
       <span class="badge">Ospite</span>
