@@ -29,7 +29,7 @@ export const routes: Routes = [
     { path: 'expenses/:id', loadComponent: () =>
         import('./pages/expenses/expense-detail/expense-detail').then(m => m.ExpenseDetail)
     },
-    { path: 'expenses/balances', loadComponent: () =>
+    { path: 'balances', loadComponent: () =>
         import('./pages/expenses/balances-global/balances-global').then(m => m.BalancesGlobal)
     },
     { path: 'events/admin', canActivate: [AuthGuard], loadComponent: () => 

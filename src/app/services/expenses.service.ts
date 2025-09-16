@@ -16,18 +16,35 @@ export class ExpensesService {
   }
 
   // CREATE
-  async create(payload: { user_id: string; amount: number; description: string; expense_date?: string; notes?: string; include_payer?: boolean; }) {
+  async create(payload: {
+    user_id: string;
+    amount: number;
+    description?: string | null;
+    expense_date?: string | null;
+    notes?: string | null;
+    include_payer: boolean;
+  }) {
+    const body: any = {
+      user_id: payload.user_id,
+      amount: payload.amount,
+    };
+    if (payload.description) body.description = payload.description;
+    if (payload.expense_date) body.expense_date = payload.expense_date; // opzionale: DB ha default
+    if (payload.notes) body.notes = payload.notes;
+
     const { data, error } = await supabase
       .from('expense')
-      .insert({
-        ...payload,
-        include_payer: payload.include_payer ?? true
-      })
+      .insert(body)
       .select()
       .single();
-    if (error) throw error;
+
+    if (error) {
+      console.error('Supabase insert error', error); // <-- importantissimo per capire subito
+      throw error;
+    }
     return data;
   }
+
 
   // DETTAGLIO
   async get(id: string) {

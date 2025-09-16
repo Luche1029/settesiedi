@@ -12,7 +12,6 @@ export interface EventRow {
 export interface EventCardVM extends EventRow {
   participants: number;      // going
   participantsNames?: string[];
-  total: number;             // somma spese €
 }
 
 @Injectable({ providedIn: 'root' })
@@ -44,37 +43,23 @@ export class EventService {
     return acc;
   }
 
-  /** Ritorna mappa {event_id -> somma spese} */
-  async sumExpensesForEvents(eventIds: string[]): Promise<Record<string, number>> {
-    if (eventIds.length === 0) return {};
-    const { data, error } = await supabase
-      .from('expense')
-      .select('event_id, amount')
-      .in('event_id', eventIds);
-    if (error) throw error;
-    const acc: Record<string, number> = {};
-    for (const e of data || []) {
-      acc[e.event_id] = (acc[e.event_id] || 0) + Number(e.amount || 0);
-    }
-    return acc;
-  }
 
   /** Comodo: eventi + stats in un colpo solo (client-side) */
-  async listByWeekWithStats(startISO: string, endISO: string): Promise<EventCardVM[]> {
-    const rows = await this.listByWeek(startISO, endISO);
-    const ids = rows.map(r => r.id);
-    const [goingMap, totalMap, namesMap] = await Promise.all([
-      this.countGoingForEvents(ids),
-      this.sumExpensesForEvents(ids),
-      this.getGoingNamesForEvents(ids),
-    ]);
-    return rows.map(r => ({
-      ...r,
-      participants: goingMap[r.id] || 0,
-      total: Number((totalMap[r.id] || 0).toFixed(2)),
-      participantsNames: namesMap[r.id] || []
-    }) as any);
-  }
+async listByWeekWithStats(startISO: string, endISO: string): Promise<EventCardVM[]> {
+  const rows = await this.listByWeek(startISO, endISO);
+  const ids = rows.map(r => r.id);
+  const [goingMap, namesMap] = await Promise.all([
+    this.countGoingForEvents(ids),
+    this.getGoingNamesForEvents(ids),
+  ]);
+
+  return rows.map(r => ({
+    ...r,
+    participants: goingMap[r.id] || 0,
+    participantsNames: namesMap[r.id] || []
+  }));
+}
+
 
 
   // + aggiungi:

@@ -40,15 +40,14 @@ export class ExpenseCreate {
         user_id: user.id,
         amount: Number(this.amount()),
         description: this.description().trim(),
-        expense_date: this.expense_date(),
-        notes: this.notes().trim() || null as any,
-        include_payer: this.include_payer()
+        expense_date: this.expense_date() || null,
+        include_payer: this.include_payer() || true
       });
       this.router.navigate(['/expenses/list']);
     } catch (e:any) {
       this.msg.set(e.message ?? 'Errore salvataggio');
-    } finally {
-      this.loading.set(false);
+      console.error('Insert expense error', e);
     }
+
   }
 }
