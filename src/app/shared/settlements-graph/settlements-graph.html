@@ -1,0 +1,56 @@
+<div class="card" style="height:520px">
+  <h3>Grafo regolazioni</h3>
+
+  <ngx-graph
+    *ngIf="(nodes?.length ?? 0) + (links?.length ?? 0) > 0"
+    class="graph"
+    [nodes]="nodes"
+    [links]="links"
+    [layout]="'dagre'"
+    [curve]="'linear'"
+    [autoCenter]="true"
+    [autoZoom]="true"
+    [zoomSpeed]="0.08"
+    [update$]="update$">
+
+    <!-- Definizioni SVG (freccia) -->
+    <ng-template #defsTemplate>
+      <svg:defs>
+        <svg:marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
+                    markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <svg:path d="M 0 0 L 10 5 L 0 10 z" [attr.fill]="accent" />
+        </svg:marker>
+      </svg:defs>
+    </ng-template>
+
+    <!-- Nodo -->
+    <ng-template #nodeTemplate let-node>
+      <svg:g class="node">
+        <svg:circle r="18"
+                    [attr.fill]="node.data.bg"
+                    [attr.stroke]="node.data.stroke"
+                    stroke-width="2" />
+        <svg:text text-anchor="middle" dy="6" font-weight="700" fill="white" style="font-size:12px">
+          {{ initials(node.label) }}
+        </svg:text>
+        <svg:title>{{ node.label }}</svg:title>
+      </svg:g>
+    </ng-template>
+
+    <!-- Arco -->
+    <ng-template #linkTemplate let-link>
+      <svg:g class="edge">
+        <svg:path class="line"
+                  stroke-linecap="round"
+                  [attr.stroke]="link.data.color"
+                  [attr.stroke-width]="link.data.width"
+                  marker-end="url(#arrow)" />
+        <svg:text class="edge-label" text-anchor="middle" dy="-4" font-weight="700">
+          € {{ link.data.amount | number:'1.2-2' }}
+        </svg:text>
+        <svg:title>{{ link.source }} → {{ link.target }} • € {{ link.data.amount | number:'1.2-2' }}</svg:title>
+      </svg:g>
+    </ng-template>
+
+  </ngx-graph>
+</div>

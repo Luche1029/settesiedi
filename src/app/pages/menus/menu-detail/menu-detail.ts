@@ -40,3 +40,4 @@ export class MenuDetailComponent implements OnInit {
     }
   }
 }
+ 

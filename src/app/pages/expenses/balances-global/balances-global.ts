@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpensesService } from '../../../services/expenses.service';
+import { SettlementsGraph } from '../../../shared/settlements-graph/settlements-graph';
 
 function firstDayOfMonthISO() {
   const d = new Date(); d.setDate(1);
@@ -12,7 +13,7 @@ function todayISO() { return new Date().toISOString().slice(0,10); }
 @Component({
   selector: 'app-balances-global',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SettlementsGraph],
   templateUrl: './balances-global.html'
 })
 export class BalancesGlobal implements OnInit {

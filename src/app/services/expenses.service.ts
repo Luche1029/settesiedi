@@ -3,6 +3,11 @@ import { supabase } from '../supabase.client';
 
 @Injectable({ providedIn: 'root' })
 export class ExpensesService {
+
+  private normDate(d: string | null | undefined) {
+    return d && d.trim() ? d : null;
+  }
+
   // LISTA (usa la view v_expense_list)
   async list(from?: string, to?: string) {
     let q = supabase.from('v_expense_list')
@@ -97,12 +102,19 @@ export class ExpensesService {
     return data || [];
   }
   async nets(from: string|null, to: string|null) {
-    const { data, error } = await supabase.rpc('expense_nets', { p_from: from, p_to: to });
+    const { data, error } = await supabase.rpc('expense_nets', {
+      p_from: this.normDate(from),
+      p_to:   this.normDate(to)
+    });
     if (error) throw error;
     return data || [];
   }
+
   async settlements(from: string|null, to: string|null) {
-    const { data, error } = await supabase.rpc('expense_settlements', { p_from: from, p_to: to });
+    const { data, error } = await supabase.rpc('expense_settlements', {
+      p_from: this.normDate(from),
+      p_to:   this.normDate(to)
+    });
     if (error) throw error;
     return data || [];
   }
