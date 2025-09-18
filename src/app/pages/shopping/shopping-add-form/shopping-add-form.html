@@ -1,0 +1,18 @@
+  <form class="card" (ngSubmit)="save()">
+    <div class="form-row cols-3">
+      <div>
+        <label>Voce</label>
+        <input class="input" [(ngModel)]="name" name="name" placeholder="es. Pane" required />
+      </div>
+      <div>
+        <label>Note</label>
+        <input class="input" [(ngModel)]="notes" name="notes" placeholder="marca, formato..." />
+      </div>
+      <div>
+        <label>Qtà</label>
+        <input class="input" type="number" min="0" step="1" [(ngModel)]="qty" name="qty" />
+      </div>
+    </div>
+    <button class="btn mt" type="submit">Aggiungi</button>
+    <small class="muted ml" *ngIf="msg()">{{ msg() }}</small>
+  </form>`

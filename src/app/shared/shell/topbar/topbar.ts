@@ -19,4 +19,9 @@ export class Topbar {
     this.auth.logout();
     this.router.navigateByUrl('/login');
   }
+
+  encodeName(name: string) {
+    return encodeURIComponent(name);
+  }
+
 }

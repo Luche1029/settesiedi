@@ -34,14 +34,7 @@
     </tbody>
   </table>
 
-  <h3 class="mt">Regolazioni “chi deve a chi”</h3>
-  <app-settlements-graph [settlements]="settlements()"></app-settlements-graph>
-
-  <ul class="mt">
-    <li *ngFor="let s of settlements()">
-      {{ s.from_name }} → {{ s.to_name }}: € {{ s.amount | number:'1.2-2' }}
-    </li>
-  </ul>
+  <app-settlements-list [settlements]="settlements()" ></app-settlements-list>
 
   <p *ngIf="msg()" class="mt">{{ msg() }}</p>
   <p *ngIf="loading()" class="mt muted">Caricamento…</p>

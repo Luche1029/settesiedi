@@ -1,0 +1,26 @@
+.mt {
+    li {
+        font-size: 15pt;
+        margin-bottom: 7px;
+        list-style: none;
+    }
+}
+
+.grouped-row {
+    display: flex;
+    flex-direction: row;
+    height: 75px;
+    width: 100%;
+}
+.grouped-col {
+    display: flex;
+    flex-direction: column;
+    height: 75px;
+    width: 33%;
+    justify-content: center;
+    padding: 15px;
+}
+
+.total {
+    text-align: center;
+}

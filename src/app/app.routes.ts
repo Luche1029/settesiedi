@@ -38,5 +38,8 @@ export const routes: Routes = [
     { path: 'auth/set-password', loadComponent: () => 
         import('./pages/auth/set-password/set-password').then(m => m.SetPassword)
     },
+    {  path: 'shopping', loadComponent: () => 
+        import('./pages/shopping/shopping-list-page/shopping-list-page').then(m => m.ShoppingListPage) 
+    },
     { path: '', redirectTo: '/login', pathMatch: 'full' }
 ];

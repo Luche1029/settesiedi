@@ -1,33 +1,32 @@
 <header class="topbar">
   <div class="logo">7siedi</div>
 
-  <nav class="flex" style="gap:12px">
+  <!-- visibile solo desktop/tablet -->
+  <nav class="flex only-desktop" style="gap:12px">
     <a routerLink="/menus" routerLinkActive="active">Menù</a>
     <a routerLink="/proposals" routerLinkActive="active">Proposte</a>
+    <a routerLink="/shopping" routerLinkActive="active">Da comprare</a>
     <a routerLink="/expenses" routerLinkActive="active">Spese</a>
     <a routerLink="/balances" routerLinkActive="active">Bilanci</a>
-    <!--a>Admin
-       <ul>
-        <li><a routerLink="/proposals/review" routerLinkActive="active">Gestisci proposte</a></li>
-        <li><a routerLink="/events/admin" routerLinkActive="active">Gestisci menù</a></li>
-
-      </ul>
-    </a-->
-   
     
+    <a routerLink="/proposals/review" routerLinkActive="active">Gestisci proposte</a>
+    <a routerLink="/events/admin" routerLinkActive="active">Gestisci menù</a>    
   </nav>
 
   <div class="spacer" style="flex:1"></div>
 
   <div class="flex" style="gap:10px; align-items:center;">
-    <span *ngIf="user(); else guest" class="badge marrone">
-      {{ user()?.display_name }}
-    </span>
+
+    <img
+      [src]="user()?.avatar_url || ('https://ui-avatars.com/api/?name=' + encodeName(user()?.display_name || 'gyust')  + '&background=EFEFFA&color=150e7a')"
+      [alt]="user()?.display_name"
+      width="52" height="52"
+      style="border-radius:50%; border:1px solid var(--hairline);"
+      *ngIf="user(); else guest" />
     <ng-template #guest>
       <span class="badge">Ospite</span>
     </ng-template>
 
     <button *ngIf="user()" class="btn secondary" (click)="logout()">Esci</button>
   </div>
-  
 </header>

@@ -2,7 +2,9 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ExpensesService } from '../../../services/expenses.service';
-import { SettlementsGraph } from '../../../shared/settlements-graph/settlements-graph';
+import { SettlementsList } from '../../../shared/ui/settlements-list/settlements-list';
+
+type Settlement = { from: string; to: string; amount: number };
 
 function firstDayOfMonthISO() {
   const d = new Date(); d.setDate(1);
@@ -13,8 +15,9 @@ function todayISO() { return new Date().toISOString().slice(0,10); }
 @Component({
   selector: 'app-balances-global',
   standalone: true,
-  imports: [CommonModule, FormsModule, SettlementsGraph],
-  templateUrl: './balances-global.html'
+  imports: [CommonModule, FormsModule, SettlementsList],
+  templateUrl: './balances-global.html',
+  styleUrl: './balances-global.scss'
 })
 export class BalancesGlobal implements OnInit {
   private svc = inject(ExpensesService);
@@ -27,7 +30,20 @@ export class BalancesGlobal implements OnInit {
   loading = signal(false);
   msg = signal('');
 
-  async ngOnInit() { await this.refresh(); }
+  async ngOnInit() {  
+    try {
+      const [n, s] = await Promise.all([
+        this.svc.nets(this.from(), this.to()),
+        this.svc.settlements(this.from(), this.to())
+      ]);
+      this.nets.set(n || []);
+      this.settlements.set(s || []);
+    } catch (e:any) {
+      this.msg.set(e.message ?? 'Errore caricamento bilanci');
+    } finally {
+      this.loading.set(false);
+    }
+  }
 
   async refresh() {
     this.loading.set(true); this.msg.set('');
