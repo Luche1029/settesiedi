@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { supabase } from '../supabase.client';
+import { supabase } from '../../../supabase/supabase.client';
 
 export type UserProfile = {
   id: string;

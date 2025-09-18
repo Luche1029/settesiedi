@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
-import { supabase } from '../supabase.client';
+import { supabase } from '../../../supabase/supabase.client';
 
 @Injectable({ providedIn: 'root' })
 export class ExpensesService {
 
-  private normDate(d: string | null | undefined) {
-    return d && d.trim() ? d : null;
+  private normDate(d: string | null | undefined) {    return d && d.trim() ? d : null;
   }
 
   // LISTA (usa la view v_expense_list)
@@ -47,6 +46,28 @@ export class ExpensesService {
       console.error('Supabase insert error', error); // <-- importantissimo per capire subito
       throw error;
     }
+    return data;
+  }
+
+  async createWithParticipants(payload: {
+    user_id: string;
+    amount: number;
+    description?: string | null;
+    expense_date?: string | null;   // 'YYYY-MM-DD'
+    notes?: string | null;
+    include_payer: boolean;
+    participants: string[];         // array di user_id aggiunti dal creatore
+  }) {
+    const { data, error } = await supabase.rpc('create_expense_with_participants', {
+      p_user_id: payload.user_id,
+      p_amount: payload.amount,
+      p_description: payload.description ?? null,
+      p_expense_date: payload.expense_date ?? null,
+      p_notes: payload.notes ?? null,
+      p_include_payer: payload.include_payer,
+      p_participants: payload.participants ?? []
+    });
+    if (error) throw error;
     return data;
   }
 

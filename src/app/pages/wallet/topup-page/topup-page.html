@@ -1,0 +1,11 @@
+  <div class="card">
+    <h2>Ricarica portafoglio</h2>
+    <form (ngSubmit)="pay()">
+      <label>Importo</label>
+      <input class="input" type="number" min="1" step="0.50" [(ngModel)]="amount" name="amount" required />
+      <div class="flex mt">
+        <button class="btn" type="submit" [disabled]="loading()">Paga con PayPal</button>
+      </div>
+      <p class="muted mt" *ngIf="msg()">{{ msg() }}</p>
+    </form>
+  </div>

@@ -7,7 +7,8 @@ import { AuthService } from '../../../services/auth.service';
   selector: 'app-topbar',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './topbar.html'
+  templateUrl: './topbar.html',
+  styleUrl: './topbar.scss'
 })
 export class Topbar {
   private auth = inject(AuthService);

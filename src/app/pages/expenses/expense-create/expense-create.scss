@@ -1,0 +1,5 @@
+.card.is-me {
+  border-color: var(--col-borders);
+  background: color-mix(in oklab, var(--col-accent) 30%, white);
+}
+.card.is-me small.muted { font-weight: 800; }

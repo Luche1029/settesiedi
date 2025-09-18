@@ -41,5 +41,8 @@ export const routes: Routes = [
     {  path: 'shopping', loadComponent: () => 
         import('./pages/shopping/shopping-list-page/shopping-list-page').then(m => m.ShoppingListPage) 
     },
+    { path: 'wallet/topup', loadComponent: () => 
+        import('./pages/wallet/topup-page/topup-page').then(m => m.TopupPage) 
+    },
     { path: '', redirectTo: '/login', pathMatch: 'full' }
 ];

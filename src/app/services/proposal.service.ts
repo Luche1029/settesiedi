@@ -1,6 +1,6 @@
 // src/app/services/proposal.service.ts
 import { Injectable } from '@angular/core';
-import { supabase } from '../supabase.client';
+import { supabase } from '../../../supabase/supabase.client';
 
 export interface ProposalItemInput { name: string; notes?: string; }
 export interface ProposalInput {

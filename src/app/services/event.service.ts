@@ -1,6 +1,6 @@
 // src/app/services/event.service.ts
 import { Injectable } from '@angular/core';
-import { supabase } from '../supabase.client';
+import { supabase } from '../../../supabase/supabase.client';
 
 export interface EventRow {
   id: string;

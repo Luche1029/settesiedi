@@ -1,6 +1,6 @@
 // src/app/services/reservation.service.ts
 import { Injectable } from '@angular/core';
-import { supabase } from '../supabase.client';
+import { supabase } from '../../../supabase/supabase.client';
 
 export type RsvpStatus = 'going' | 'maybe' | 'not_going';
 

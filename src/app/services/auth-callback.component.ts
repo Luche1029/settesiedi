@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { supabase } from '../supabase.client';
-
+import { supabase } from '../../../supabase/supabase.client';
 @Component({
   standalone: true,
   template: `<div class="login-box"><h2>Accesso in corso…</h2><p class="muted">Un attimo…</p></div>`

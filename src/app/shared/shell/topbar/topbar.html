@@ -1,16 +1,39 @@
 <header class="topbar">
-  <div class="logo">7siedi</div>
+  <div class="logo">
+    <img src="assets/images/pApp.png" class="menu-logo" />
+  </div>
 
   <!-- visibile solo desktop/tablet -->
   <nav class="flex only-desktop" style="gap:12px">
-    <a routerLink="/menus" routerLinkActive="active">Menù</a>
-    <a routerLink="/proposals" routerLinkActive="active">Proposte</a>
-    <a routerLink="/shopping" routerLinkActive="active">Da comprare</a>
-    <a routerLink="/expenses" routerLinkActive="active">Spese</a>
-    <a routerLink="/balances" routerLinkActive="active">Bilanci</a>
-    
-    <a routerLink="/proposals/review" routerLinkActive="active">Gestisci proposte</a>
-    <a routerLink="/events/admin" routerLinkActive="active">Gestisci menù</a>    
+    <a routerLink="/menus" routerLinkActive="active">
+      <span class="material-symbols-outlined">menu_book_2</span>menu
+    </a>
+    <a routerLink="/proposals" routerLinkActive="active">
+       <span class="material-symbols-outlined">chef_hat</span>proposte
+    </a>
+    <a routerLink="/shopping" routerLinkActive="active">
+      <span class="material-symbols-outlined">receipt_long</span>lista
+    </a>
+    <a routerLink="/expenses" routerLinkActive="active">
+      <span class="material-symbols-outlined">point_of_sale</span>spese
+    </a>
+    <a routerLink="/balances" routerLinkActive="active">
+      <span class="material-symbols-outlined">payments</span>bilanci
+    </a>
+    <a routerLink="/wallet/topup" routerLinkActive="active">
+      <span class="material-symbols-outlined">wallet</span>pagamenti
+    </a>
+
+    <a routerLink="/proposals/review" 
+      routerLinkActive="active"
+      *ngIf="user()?.is_admin">
+        <span class="material-symbols-outlined">settings_panorama</span>gestisci proposte
+    </a>
+    <a routerLink="/events/admin" 
+      routerLinkActive="active"
+      *ngIf="user()?.is_admin">
+        <span class="material-symbols-outlined">settings_cinematic_blur</span>gestisci menù
+    </a>    
   </nav>
 
   <div class="spacer" style="flex:1"></div>
@@ -27,6 +50,8 @@
       <span class="badge">Ospite</span>
     </ng-template>
 
-    <button *ngIf="user()" class="btn secondary" (click)="logout()">Esci</button>
+    <button *ngIf="user()" class="btn secondary" (click)="logout()">
+      <span class="material-symbols-outlined">exit_to_app</span>
+    </button>
   </div>
 </header>
