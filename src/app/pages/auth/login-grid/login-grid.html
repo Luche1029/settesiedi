@@ -28,8 +28,8 @@
 
   <!-- Dettaglio profilo selezionato -->
   <div *ngIf="selected()" class="mt">
-    <div class="flex" style="align-items:center; gap:12px;">
-      <button class="btn ghost" (click)="back()">← Indietro</button>
+    <div class="flex" style="align-items:flex-start; gap:12px;flex-direction: column;">
+      
       <h3>{{ selected()?.display_name }}</h3>
       <span class="muted">({{ selected()?.email }})</span>
     </div>
@@ -46,7 +46,8 @@
         <label>Password</label>
         <input class="input" type="password" [(ngModel)]="password" placeholder="••••••" />
       </div>
-      <div class="center">
+      <div class="buttons">
+        <button class="btn ghost" (click)="back()">← Indietro</button>
         <button class="btn" (click)="login()" [disabled]="!password() || loading()">Entra</button>
       </div>
     </div>

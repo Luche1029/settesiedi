@@ -62,6 +62,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+button {
+  width: 100%;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   * { transition: color $speed $easing, background-color $speed $easing, border-color $speed $easing, box-shadow $speed $easing, transform $speed $easing; }
 }
@@ -270,6 +274,7 @@ label { font-weight: 650; color: $text; display: block; margin-bottom: 8px; }
 */
 /* ===== Responsive helpers ===== */
 $bp-tablet: 900px;
+$bp-smartphone: 760px;
 
 .only-desktop { display: none; }
 .only-mobile  { display: block; }
@@ -311,5 +316,13 @@ $bp-tablet: 900px;
   main, .container, .page, body {
     /* scegli il wrapper più adatto al tuo layout */
     padding-bottom: 64px; /* ≈ altezza bottom bar */
+  }
+}
+
+@media (max-width: $bp-smartphone) {
+
+
+  .flex {
+    flex-direction: column;
   }
 }

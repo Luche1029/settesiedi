@@ -1,10 +1,7 @@
 <div class="card">
   <div class="flex" style="align-items:center; justify-content:space-between;">
-    <h2>Menù della settimana <small class="muted">({{ weekLabel() }})</small></h2>
-    <div class="flex" style="gap:8px">
-      <button class="btn secondary" (click)="prevWeek()">← Settimana precedente</button>
-      <button class="btn" (click)="nextWeek()">Settimana successiva →</button>
-    </div>
+    <h2>Menù della settimana <br><small class="muted">({{ weekLabel() }})</small></h2>
+    
   </div>
 
   <p *ngIf="message()" class="mt">{{ message() }}</p>
@@ -47,4 +44,9 @@
   <p *ngIf="!loading() && items().length === 0" class="mt muted">
     Nessun evento in questa settimana.
   </p>
+
+  <div class="flex" style="gap:8px; margin-top: 15px;;">
+    <button class="btn secondary" (click)="prevWeek()">← Settimana precedente</button>
+    <button class="btn" (click)="nextWeek()">Settimana successiva →</button>
+  </div>
 </div>

@@ -8,7 +8,8 @@ import { AuthService, UserProfile } from '../../../services/auth.service';
   selector: 'app-login-grid',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './login-grid.html'
+  templateUrl: './login-grid.html',
+  styleUrl: './login-grid.scss'
 })
 export class LoginGrid implements OnInit {
 

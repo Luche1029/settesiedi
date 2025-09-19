@@ -49,6 +49,12 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
+            },
+            "subdomain": {
+              "baseHref": "/",
+              "deployUrl": "/",
+              "outputHashing": "all",
+              "serviceWorker": false
             }
           },
           "defaultConfiguration": "production"

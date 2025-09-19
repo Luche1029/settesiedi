@@ -10,7 +10,8 @@ type StatusFilter = 'all' | 'draft' | 'submitted' | 'approved' | 'rejected';
   selector: 'app-proposals-list',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './proposals-list.html'
+  templateUrl: './proposals-list.html',
+  styleUrl: './proposals-list.scss'
 })
 export class ProposalsList implements OnInit {
   private svc = inject(ProposalService);

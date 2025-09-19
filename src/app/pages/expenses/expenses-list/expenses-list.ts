@@ -7,7 +7,8 @@ import { ExpensesService } from '../../../services/expenses.service';
   selector: 'app-expenses-list',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './expenses-list.html'
+  templateUrl: './expenses-list.html',
+  styleUrl: './expenses-list.scss'
 })
 export class ExpensesList implements OnInit {
   private svc = inject(ExpensesService);

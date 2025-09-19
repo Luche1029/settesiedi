@@ -9,7 +9,8 @@ import { ShoppingAddForm } from '../shopping-add-form/shopping-add-form';
   selector: 'app-shopping-list',
   standalone: true,
   imports: [CommonModule, ShoppingAddForm],
-  templateUrl: './shopping-list-page.html'
+  templateUrl: './shopping-list-page.html',
+  styleUrl: './shopping-list-page.scss'
 })
 export class ShoppingListPage implements OnInit {
   private svc = inject(ShoppingService);

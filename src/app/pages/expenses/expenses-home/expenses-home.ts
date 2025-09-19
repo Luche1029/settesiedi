@@ -14,7 +14,8 @@ function firstDayOfMonthISO() {
   selector: 'app-expenses-home',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './expenses-home.html'
+  templateUrl: './expenses-home.html',
+  styleUrl: './expenses-home.scss'
 })
 export class ExpensesHome implements OnInit {
   private svc = inject(ExpensesService);

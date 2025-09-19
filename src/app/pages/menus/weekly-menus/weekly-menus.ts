@@ -22,7 +22,8 @@ function toISODate(date: Date) {
   selector: 'app-weekly-menus',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './weekly-menus.html'
+  templateUrl: './weekly-menus.html',
+  styleUrl: './weekly-menus.scss'
 })
 export class WeeklyMenus implements OnInit {
 

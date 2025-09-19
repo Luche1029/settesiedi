@@ -21,6 +21,8 @@ export class TopupPage {
   msg = signal('');
 
   async pay() {
+    this.msg = signal('Magari!');
+    /*
     const me = this.auth.user(); if (!me) { this.msg.set('Fai login'); return; }
     this.loading.set(true); this.msg.set('');
     try {
@@ -31,6 +33,6 @@ export class TopupPage {
       this.msg.set(e.message ?? 'Errore pagamento');
     } finally {
       this.loading.set(false);
-    }
+    }*/
   }
 }

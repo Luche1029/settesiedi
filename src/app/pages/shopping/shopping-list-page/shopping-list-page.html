@@ -1,44 +1,39 @@
 <div class="container">
-    <h2>Lista spesa</h2>
+  <h2>Lista spesa</h2>
 
-    <app-shopping-add-form></app-shopping-add-form>
+  <app-shopping-add-form></app-shopping-add-form>
 
-    <div class="grid mt">
-      <!-- Aperte -->
-      <div class="card">
-        <h3>Da comprare</h3>
-        <ul class="no-bullets mt">
-          <li *ngFor="let r of open()" class="flex" style="justify-content:space-between; align-items:center;">
-            <div>
-              <strong>{{ r.name }}</strong>
-              <small class="muted" *ngIf="r.notes"> — {{ r.notes }}</small>
-              <small class="muted" *ngIf="r.qty"> — x{{ r.qty }}</small>
-              <div><small class="muted">aggiunto da {{ r.added_name || '—' }}</small></div>
-            </div>
-            <div class="flex">
-              <button class="btn" (click)="toggle(r)">Comprato</button>
-              <button class="btn ghost ml" *ngIf="canDelete(r)" (click)="remove(r)">Elimina</button>
-            </div>
-          </li>
-          <li *ngIf="!open().length" class="muted">Niente da comprare 🎉</li>
-        </ul>
+  <div class="grid mt">
+    <!-- Aperte -->
+    <div class="card">
+      <h3>Da comprare</h3>
+      <div *ngFor="let r of open()" class="card" style="justify-content:space-between; align-items:center;">
+        <div class="flex vertical">
+          <strong>{{ r.name }}<small class="muted" *ngIf="r.qty"> — x{{ r.qty }}</small></strong>
+          <small class="muted">aggiunto da {{ r.added_name || '—' }}</small>
+          <small class="muted" *ngIf="r.notes"> — {{ r.notes }}</small>              
+        </div>
+        <div class="flex">
+          <button class="btn" (click)="toggle(r)">Comprato</button>
+          <button class="btn ghost ml" *ngIf="canDelete(r)" (click)="remove(r)">Elimina</button>
+        </div>
       </div>
+      <div *ngIf="!open().length" class="muted">Niente da comprare 🎉</div>       
+    </div>
 
-      <!-- Comprate -->
-      <div class="card">
-        <h3>Comprate di recente</h3>
-        <ul class="no-bullets mt">
-          <li *ngFor="let r of purchased()">
-            <strong>{{ r.name }}</strong>
-            <small class="muted" *ngIf="r.notes"> — {{ r.notes }}</small>
-            <div><small class="muted">da {{ r.purchased_name || '—' }} • {{ r.purchased_at | date:'short' }}</small></div>
-            <div class="mt">
-              <button class="btn ghost" (click)="toggle(r)">Ripristina</button>
-              <button class="btn ghost ml" *ngIf="canDelete(r)" (click)="remove(r)">Elimina</button>
-            </div>
-          </li>
-          <li *ngIf="!purchased().length" class="muted">Nessun acquisto recente</li>
-        </ul>
+    <!-- Comprate -->
+    <div class="card">
+      <h3>Comprate di recente</h3>    
+      <div *ngFor="let r of purchased()" class="card" style="justify-content:space-between; align-items:center;">
+        <strong>{{ r.name }}</strong>
+        <small class="muted" *ngIf="r.notes"> — {{ r.notes }}</small>
+        <div><small class="muted">comprato da {{ r.purchased_name || '—' }} • {{ r.purchased_at | date:'short' }}</small></div>
+        <div class="flex">
+          <button class="btn ghost" (click)="toggle(r)">Ripristina</button>
+          <button class="btn ghost ml" *ngIf="canDelete(r)" (click)="remove(r)">Elimina</button>
+          
+        </div>
+        <div *ngIf="!purchased().length" class="muted">Nessun acquisto recente</div>       
       </div>
     </div>
 

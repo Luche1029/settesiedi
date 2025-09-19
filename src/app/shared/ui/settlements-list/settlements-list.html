@@ -9,12 +9,22 @@
   </div>
 
   <!-- Nessun raggruppamento -->
-  <ul class="mt" *ngIf="groupBy()==='none'">
-    <li *ngFor="let r of rows()">
-      <strong>{{ r.from }}</strong> → € {{ r.amount | number:'1.2-2' }} → <strong>{{ r.to }}</strong>
-    
-    </li>
-  </ul>
+  <div class="card mt" *ngIf="groupBy()==='none'">
+    <table>
+      <tr *ngFor="let r of rows()">
+        <td>
+          <strong>{{ r.from }}</strong>
+        </td>
+        <td>
+          → € {{ r.amount | number:'1.2-2' }} → 
+        </td> 
+        <td>
+          <strong>{{ r.to }}</strong>
+        </td>    
+      </tr>
+    </table>
+
+  </div>
 
   <!-- Raggruppato -->
   <div class="mt" *ngIf="groupBy()!=='none'">

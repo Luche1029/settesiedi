@@ -15,15 +15,17 @@
              (ngModelChange)="to.set($event)" />
     </div>
     <div class="center">
+      <label>&nbsp;</label>
       <button class="btn" (click)="refresh()">Aggiorna</button>
     </div>
   </div>
 
-  <div class="mt">
-    <span class="badge ocra">Totale: € {{ total() | number:'1.2-2' }}</span>
-    <button class="btn ml" [routerLink]="['/expenses/new']">+ Nuova spesa</button>
-    <button class="btn secondary ml" [routerLink]="['/expenses/list']">Vedi elenco</button>
-    <button class="btn secondary ml" [routerLink]="['/expenses/balances']">Bilanci</button>
+  
+
+  <div class="flex">
+    <button class="btn" [routerLink]="['/expenses/new']">+ Nuova spesa</button>
+    <button class="btn secondary" [routerLink]="['/expenses/list']">Vedi elenco</button>
+    <button class="btn secondary" [routerLink]="['/balances']">Bilanci</button>
   </div>
 
   <table class="table mt" *ngIf="perPayer().length">
@@ -35,8 +37,14 @@
         <td>{{ p.display_name }}</td>
         <td>€ {{ p.total | number:'1.2-2' }}</td>
       </tr>
+      <tr>
+      <td colspan="2" style="text-align: right;"> <span class="badge ocra">Totale: € {{ total() | number:'1.2-2' }}</span></td>
+      </tr>
     </tbody>
   </table>
+
+  
+   
 
   <p *ngIf="msg()" class="mt">{{ msg() }}</p>
   <p *ngIf="loading()" class="mt muted">Caricamento…</p>

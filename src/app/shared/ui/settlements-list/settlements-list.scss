@@ -6,16 +6,19 @@
     }
 }
 
+td {
+    font-size: 15pt;
+}
 .grouped-row {
     display: flex;
     flex-direction: row;
-    height: 75px;
+    height: 125px;
     width: 100%;
 }
 .grouped-col {
     display: flex;
     flex-direction: column;
-    height: 75px;
+    height: 125px;
     width: 33%;
     justify-content: center;
     padding: 15px;
@@ -23,4 +26,21 @@
 
 .total {
     text-align: center;
+}
+
+.card {
+    margin-top: 19px;
+}
+
+@media (max-width:760px) {
+    .grouped-row {
+        flex-direction: column;
+        height: auto;
+        width: 100%;        
+    }
+
+    .grouped-col {
+        height: auto;
+        width: 100%;
+    }
 }
