@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { EventService, EventCardVM } from '../../../services/event.service';
 import { ReservationService, RsvpStatus } from '../../../services/reservation.service';
 import { AuthService } from '../../../services/auth.service';
+import { RouterModule, Router } from '@angular/router';
+
 
 function mondayOfWeek(d = new Date()) {
   const x = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
@@ -21,7 +23,7 @@ function toISODate(date: Date) {
 @Component({
   selector: 'app-weekly-menus',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './weekly-menus.html',
   styleUrl: './weekly-menus.scss'
 })
@@ -38,6 +40,8 @@ export class WeeklyMenus implements OnInit {
   loading = signal(false);
   message = signal('');
   items   = signal<EventCardVM[]>([]);
+
+  itemsByEvent = signal<Record<string, any[]>>({});
 
   user = computed(() => this.auth.user());
 
@@ -56,6 +60,8 @@ export class WeeklyMenus implements OnInit {
     try {
       const data = await this.eventsSvc.listByWeekWithStats(this.startISO(), this.endISO());
       this.items.set(data);
+      this.itemsByEvent.set({});
+      await this.afterLoadEvents();
     } catch (e: any) {
       this.message.set(e.message ?? 'Errore caricamento');
     } finally {
@@ -63,6 +69,16 @@ export class WeeklyMenus implements OnInit {
     }
   }
 
+  async afterLoadEvents() {
+    const ids = this.items().map(e => e.id);
+    const rows = await this.eventsSvc.getItemsForEvents(ids);
+    const map: Record<string, any[]> = {};
+    for (const r of rows) {
+      (map[r.event_id] ||= []).push(r);
+    }
+    this.itemsByEvent.set(map);
+  }
+  
   prevWeek() {
     this.monday.set(addDays(this.monday(), -7));
     this.load();

@@ -13,7 +13,7 @@ import { Balances } from '../parts/balances/balances';
   imports: [CommonModule, EventItems, Reservations, Expenses, Balances],
   templateUrl: './menu-detail.html'
 })
-export class MenuDetailComponent implements OnInit {
+export class MenuDetail implements OnInit {
   private route = inject(ActivatedRoute);
   private events = inject(EventService);
 

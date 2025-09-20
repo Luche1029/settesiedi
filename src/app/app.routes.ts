@@ -8,6 +8,9 @@ export const routes: Routes = [
     { path: 'menus', canActivate: [AuthGuard], loadComponent: () => 
         import('./pages/menus/weekly-menus/weekly-menus').then(m => m.WeeklyMenus) 
     },
+    { path: 'menus/:id', canActivate: [AuthGuard], loadComponent: () => 
+        import('./pages/menus/menu-detail/menu-detail').then(m => m.MenuDetail) 
+    },
     { path: 'proposals', canActivate: [AuthGuard], loadComponent: () => 
         import('./pages/proposals/proposals-list/proposals-list').then(m => m.ProposalsList)
     },

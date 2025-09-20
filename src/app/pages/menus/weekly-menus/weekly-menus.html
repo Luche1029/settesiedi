@@ -9,7 +9,17 @@
 
   <div class="grid mt" *ngIf="!loading()">
     <div class="event-card" *ngFor="let ev of items()">
-      <div class="title">{{ ev.event_date | date:'EEEE d MMMM' }}</div>
+      <div class="title">
+        {{ ev.event_date | date:'EEEE' }} - {{ev.title}}
+        
+      </div>
+      <ul>
+        <li *ngFor="let el of itemsByEvent()[ev.id] ">
+          {{el.name}}
+        </li>
+      </ul>    
+
+
       <div class="meta">
         <!-- Badge cliccabile -->
         <div class="badge" style="position:relative; cursor:pointer;"
@@ -29,6 +39,7 @@
           </div>
         </div>
 
+        <a class="btn secondary" [routerLink]="['/menus', ev.id]">Dettagli</a>
       </div>
       <p *ngIf="ev.notes" class="mt">{{ ev.notes }}</p>
 
@@ -36,7 +47,6 @@
         <button class="btn rsvp-going" (click)="rsvp(ev, 'going')">Partecipo</button>
         <button class="btn rsvp-maybe" (click)="rsvp(ev, 'maybe')">Forse</button>
         <button class="btn rsvp-no" (click)="rsvp(ev, 'not_going')">No</button>
-        <!--a class="btn secondary" [routerLink]="['/menus', ev.id]">Dettagli</a-->
       </div>
     </div>
   </div>
