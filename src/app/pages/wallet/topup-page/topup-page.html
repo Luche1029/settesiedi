@@ -1,11 +1,16 @@
   <div class="card">
     <h2>Ricarica portafoglio</h2>
-    <form (ngSubmit)="pay()">
+
+    <p class="muted" *ngIf="amount === null">Caricamento…</p>
+
+    <form (ngSubmit)="pay()" *ngIf="amount !== null && amount  > 0">
       <label>Importo</label>
-      <input class="input" type="number" min="1" step="0.50" [(ngModel)]="amount" name="amount" required />
+      <input class="input" type="number" min="1" step="0.01" [(ngModel)]="amount" name="amount" required [max]="amount" />
       <div class="flex mt">
         <button class="btn" type="submit" [disabled]="loading()">Paga con PayPal</button>
       </div>
       <p class="muted mt" *ngIf="msg()">{{ msg() }}</p>
     </form>
+    <p  *ngIf="(amount || 0) < 0">sono gi altri che devono a te  !</p>
+    <p  *ngIf="amount === 0">non devi niente a nessuno</p>    
   </div>
