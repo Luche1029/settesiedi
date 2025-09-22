@@ -7,15 +7,15 @@
       <nav class="tabs mt">
         <button (click)="tab='items'" [class.active]="tab==='items'">Piatti</button>
         <button (click)="tab='rsvp'"  [class.active]="tab==='rsvp'">Prenotazioni</button>
-        <button (click)="tab='exp'"   [class.active]="tab==='exp'">Spese</button>
-        <button (click)="tab='bal'"   [class.active]="tab==='bal'">Bilanci</button>
+        <!--button (click)="tab='exp'"   [class.active]="tab==='exp'">Spese</button>
+        <button (click)="tab='bal'"   [class.active]="tab==='bal'">Bilanci</button-->
       </nav>
 
       <section [ngSwitch]="tab" class="mt">
         <app-event-items   *ngSwitchCase="'items'" [eventId]="eventId" [items]="event()?.event_item || []"></app-event-items>
         <app-reservations  *ngSwitchCase="'rsvp'"  [eventId]="eventId"></app-reservations>
-        <app-expenses      *ngSwitchCase="'exp'"></app-expenses>
-        <app-balances      *ngSwitchCase="'bal'"></app-balances>
+        <!--app-expenses      *ngSwitchCase="'exp'"></app-expenses>
+        <app-balances      *ngSwitchCase="'bal'"></app-balances-->
       </section>
     </div>
   </div>

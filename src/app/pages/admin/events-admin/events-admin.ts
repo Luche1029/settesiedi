@@ -13,7 +13,8 @@ function addDaysISO(iso: string, n: number) {
   selector: 'app-events-admin',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './events-admin.html'
+  templateUrl: './events-admin.html',
+  styleUrl: './events-admin.scss'
 })
 export class EventsAdmin implements OnInit {
   private events = inject(EventService);

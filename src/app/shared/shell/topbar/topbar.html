@@ -3,44 +3,37 @@
     <img src="assets/images/pApp.png" class="menu-logo" />
   </div>
 
-  <!-- visibile solo desktop/tablet -->
-  <nav class="flex only-desktop" style="gap:12px">
-    <a routerLink="/menus" routerLinkActive="active">
-      <span class="material-symbols-outlined">menu_book_2</span>menu
-    </a>
-    <a routerLink="/proposals" routerLinkActive="active">
-       <span class="material-symbols-outlined">chef_hat</span>proposte
-    </a>
-    <a routerLink="/shopping" routerLinkActive="active">
-      <span class="material-symbols-outlined">receipt_long</span>lista
-    </a>
-    <a routerLink="/expenses" routerLinkActive="active">
-      <span class="material-symbols-outlined">point_of_sale</span>spese
-    </a>
-    <a routerLink="/balances" routerLinkActive="active">
-      <span class="material-symbols-outlined">payments</span>bilanci
-    </a>
-    <a routerLink="/wallet/topup" routerLinkActive="active">
-      <span class="material-symbols-outlined">wallet</span>pagamenti
-    </a>
+  <nav class="flex" style="gap:12px" *ngIf="user()?.id">
+    <div class="only-desktop" >
+      <a routerLink="/menus" routerLinkActive="active">
+        <span class="material-symbols-outlined">menu_book_2</span>menu
+      </a>
+      <a routerLink="/proposals" routerLinkActive="active">
+        <span class="material-symbols-outlined">chef_hat</span>proposte
+      </a>
+      <a routerLink="/shopping" routerLinkActive="active">
+        <span class="material-symbols-outlined">receipt_long</span>lista
+      </a>
+      <a routerLink="/expenses" routerLinkActive="active">
+        <span class="material-symbols-outlined">point_of_sale</span>spese
+      </a>
+      <a routerLink="/balances" routerLinkActive="active">
+        <span class="material-symbols-outlined">payments</span>bilanci
+      </a>
+      <a routerLink="/wallet/topup" routerLinkActive="active">
+        <span class="material-symbols-outlined">wallet</span>pagamenti
+      </a>
+    </div>
 
-    <a routerLink="/proposals/review" 
-      routerLinkActive="active"
-      *ngIf="user()?.is_admin">
-        <span class="material-symbols-outlined">settings_panorama</span>gestisci proposte
-    </a>
-    <a routerLink="/events/admin" 
-      routerLinkActive="active"
-      *ngIf="user()?.is_admin">
-        <span class="material-symbols-outlined">settings_cinematic_blur</span>gestisci menù
-    </a>    
+
+    
   </nav>
 
   <div class="spacer" style="flex:1"></div>
 
-  <div class="flex" style="gap:10px; align-items:center;">
-
+  <div class="flex" >
     <img
+      (click)="isSubmenuVisible = !isSubmenuVisible"
       [src]="user()?.avatar_url || ('https://ui-avatars.com/api/?name=' + encodeName(user()?.display_name || 'gyust')  + '&background=EFEFFA&color=150e7a')"
       [alt]="user()?.display_name"
       width="52" height="52"
@@ -48,10 +41,24 @@
       *ngIf="user(); else guest" />
     <ng-template #guest>
       <span class="badge">Ospite</span>
-    </ng-template>
+    </ng-template>    
 
     <button *ngIf="user()" class="btn secondary" (click)="logout()">
       <span class="material-symbols-outlined">exit_to_app</span>
     </button>
   </div>
+
+  <div class="sub-menu" *ngIf="user() && user()?.is_admin && isSubmenuVisible">
+    <a routerLink="/proposals/review" 
+        routerLinkActive="active"
+        style="color: #999">
+          <span class="material-symbols-outlined">settings_panorama</span>gestisci proposte
+      </a>
+      <a routerLink="/events/admin" 
+        routerLinkActive="active"
+        style="color: #999">
+          <span class="material-symbols-outlined">settings_cinematic_blur</span>gestisci menù
+      </a>    
+  </div>
+
 </header>

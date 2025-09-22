@@ -10,9 +10,12 @@ import { AuthService } from '../../../services/auth.service';
   templateUrl: './topbar.html',
   styleUrl: './topbar.scss'
 })
+
 export class Topbar {
   private auth = inject(AuthService);
   private router = inject(Router);
+
+  isSubmenuVisible = false;
 
   user = computed(() => this.auth.user());
 

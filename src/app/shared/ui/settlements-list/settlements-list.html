@@ -1,12 +1,12 @@
 <div class="card">
-  <div class="flex" style="justify-content:space-between; align-items:center;">
-    <h3>Chi deve a chi</h3>
-    <div class="flex" style="gap:8px;">
+      <h3>Chi deve a chi</h3>
+
+    <div class="flex">
       <button class="btn ghost" [class.active]="groupBy()==='none'"    (click)="groupBy.set('none')">Nessun raggruppamento</button>
       <button class="btn ghost" [class.active]="groupBy()==='debtor'"  (click)="groupBy.set('debtor')">Per debitore</button>
       <button class="btn ghost" [class.active]="groupBy()==='creditor'" (click)="groupBy.set('creditor')">Per creditore</button>
     </div>
-  </div>
+
 
   <!-- Nessun raggruppamento -->
   <div class="card mt" *ngIf="groupBy()==='none'">

@@ -1,21 +1,26 @@
-<nav class="bottom-nav only-mobile">
+<nav class="bottom-nav only-mobile" *ngIf="user()?.id">
   <a routerLink="/menus" routerLinkActive="active">    
     <span class="material-symbols-outlined">menu_book_2</span>
+    <br><small>menu</small>
   </a>
   <a routerLink="/proposals" routerLinkActive="active">
     <span class="material-symbols-outlined">chef_hat</span>
+    <br><small>proposte</small>
   </a>
   <a routerLink="/shopping" routerLinkActive="active">
     <span class="material-symbols-outlined">receipt_long</span>
+    <br><small>lista</small>
   </a>
   <a routerLink="/expenses" routerLinkActive="active">
    <span class="material-symbols-outlined">point_of_sale</span>
+    <br><small>spese</small>
   </a>
   <a routerLink="/balances" routerLinkActive="active">
     <span class="material-symbols-outlined">payments</span>
+    <br><small>pagamenti</small>
   </a>
   <a routerLink="/wallet/topup" routerLinkActive="active">
     <span class="material-symbols-outlined">wallet</span>
+    <br><small>pagamenti</small>
   </a>
-
 </nav>

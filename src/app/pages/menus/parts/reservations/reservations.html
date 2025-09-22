@@ -1,22 +1,22 @@
 <div class="card">
-      <h3>Prenotazioni</h3>
-      <div class="mt">
-        <button class="btn rsvp-going" (click)="set('going')">Partecipo</button>
-        <button class="btn rsvp-maybe ml" (click)="set('maybe')">Forse</button>
-        <button class="btn rsvp-no ml" (click)="set('not_going')">No</button>
-      </div>
+  <h3>Prenotazioni</h3>
+  <div class="mt buttons">
+    <button class="btn rsvp-going" (click)="set('going')">Partecipo</button>
+    <button class="btn rsvp-maybe ml" (click)="set('maybe')">Forse</button>
+    <button class="btn rsvp-no ml" (click)="set('not_going')">No</button>
+  </div>
 
-      <table class="table mt" *ngIf="rows().length">
-        <thead><tr><th>Nome</th><th>Stato</th><th>Quando</th></tr></thead>
-        <tbody>
-          <tr *ngFor="let r of rows()">
-            <td>{{ r.name }}</td>
-            <td>{{ r.status }}</td>
-            <td>{{ r.created_at | date:'short' }}</td>
-          </tr>
-        </tbody>
-      </table>
+  <table class="table mt" *ngIf="rows().length">
+    <thead><tr><th>Nome</th><th>Stato</th><th>Quando</th></tr></thead>
+    <tbody>
+      <tr *ngFor="let r of rows()">
+        <td>{{ r.name }}</td>
+        <td>{{ r.status }}</td>
+        <td>{{ r.created_at | date:'short' }}</td>
+      </tr>
+    </tbody>
+  </table>
 
-      <p *ngIf="!rows().length" class="muted mt">Nessuna prenotazione.</p>
-      <p *ngIf="message()" class="mt">{{ message() }}</p>
-    </div>
+  <p *ngIf="!rows().length" class="muted mt">Nessuna prenotazione.</p>
+  <p *ngIf="message()" class="mt">{{ message() }}</p>
+</div>

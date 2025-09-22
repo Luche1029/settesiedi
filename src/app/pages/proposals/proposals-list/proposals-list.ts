@@ -52,7 +52,7 @@ export class ProposalsList implements OnInit {
   }
 
   edit(p: any) {
-    this.router.navigate(['/proposals/edit', p.id]);
+    this.router.navigate(['/proposals/', p.id]);
   }
 
   async submit(p: any) {

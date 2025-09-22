@@ -4,3 +4,15 @@
   border: 1px solid var(--hairline); border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
+
+.flex {
+  flex-direction: row; 
+  button {
+    display: flex;
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    gap: 9px;
+  }
+}

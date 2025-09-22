@@ -56,7 +56,13 @@
   </p>
 
   <div class="flex" style="gap:8px; margin-top: 15px;;">
-    <button class="btn secondary" (click)="prevWeek()">← Settimana precedente</button>
-    <button class="btn" (click)="nextWeek()">Settimana successiva →</button>
+    <button class="btn secondary" (click)="prevWeek()">
+      <div>←</div> 
+      <div>Settimana precedente</div>
+    </button>
+    <button class="btn" (click)="nextWeek()">
+      <div>Settimana successiva</div>
+      <div>→</div>  
+    </button>
   </div>
 </div>

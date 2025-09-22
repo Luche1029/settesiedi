@@ -7,7 +7,8 @@ import { AuthService } from '../../../../services/auth.service';
   selector: 'app-reservations',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './reservations.html'
+  templateUrl: './reservations.html',
+  styleUrl: './reservations.scss'
 })
 export class Reservations implements OnInit {
   @Input() eventId!: string;

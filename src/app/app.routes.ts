@@ -17,6 +17,9 @@ export const routes: Routes = [
     { path: 'proposals/new', canActivate: [AuthGuard], loadComponent: () => 
         import('./pages/proposals/proposal-form/proposal-form').then(m => m.ProposalForm) 
     },
+    { path: 'proposals/:id', canActivate: [AuthGuard], loadComponent: () => 
+        import('./pages/proposals/proposal-edit/proposal-edit').then(m => m.ProposalEdit) 
+    },
     { path: 'proposals/review', canActivate: [AuthGuard], loadComponent: () => 
         import('./pages/admin/proposals-review/proposals-review').then(m => m.ProposalsReview) 
     },  

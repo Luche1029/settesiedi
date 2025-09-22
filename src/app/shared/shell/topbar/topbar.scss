@@ -6,3 +6,24 @@
     margin-right: 5px;
 }
 
+.flex {
+    flex-direction: row;
+    width:fit-content;
+}
+
+.sub-menu {
+    display: flex;
+    flex-direction: row;
+    position:absolute;
+    right: 0px;
+    top: 59px;
+    background-color:#fff;
+    width:auto;
+    padding: 10px;
+}
+
+@media (max-width: 760px) {
+    .sub-menu {
+        width: 100%;
+    }
+}

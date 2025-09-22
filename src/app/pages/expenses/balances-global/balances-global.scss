@@ -1,0 +1,66 @@
+/* desktop default: normale */
+.pay-table-wrap { overflow: visible; }
+
+.only-mobile {
+  display: none;
+}
+/* mobile: prima colonna sticky, resto scrollabile */
+@media (max-width: 760px) {
+  .desktop-tablet {
+    display: none;
+  }
+
+  .only-mobile {
+    display: block;
+  }
+  
+  .pay-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* inerzia su iOS */
+    border-radius: 8px;
+  }
+
+  .pay-table {
+    border-collapse: separate; /* evita bug con sticky */
+    border-spacing: 0;
+    min-width: 520px;           /* spazio per le 3 colonne */
+    table-layout: fixed;
+    width: max-content;         /* si adatta al contenuto */
+  }
+
+  .pay-table th,
+  .pay-table td {
+    white-space: nowrap;
+    padding: .6rem .8rem;
+  }
+
+  /* prima colonna fissa */
+  .pay-table .sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 2;                 /* sopra le altre celle */
+    background: #fff;           /* o var(--surface) */
+    box-shadow: 2px 0 0 0 rgba(0,0,0,.06); /* separatore verticale */
+    min-width: 140px;           /* scegli tu */
+    max-width: 200px;
+  }
+
+  /* header sopra alle celle sticky */
+  .pay-table thead .sticky-col { z-index: 3; }
+
+  /* un minimo di larghezza alle colonne scorrevoli */
+  .pay-table th:not(.sticky-col),
+  .pay-table td:not(.sticky-col) { min-width: 120px; }
+
+  /* colori +/− */
+  .pay-table td.positive { color: #0a8a3a; }
+  .pay-table td.negative { color: #c0392b; }
+}
+
+/* opzionale: gradienti ai bordi per indicare scroll */
+@media (max-width: 640px) {
+  .pay-table-wrap {
+    position: relative;
+    mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+  }
+}
