@@ -23,19 +23,19 @@ export const routes: Routes = [
     { path: 'proposals/review', canActivate: [AuthGuard], loadComponent: () => 
         import('./pages/admin/proposals-review/proposals-review').then(m => m.ProposalsReview) 
     },  
-    { path: 'expenses', loadComponent: () =>
+    { path: 'expenses', canActivate: [AuthGuard], loadComponent: () => 
       import('./pages/expenses/expenses-home/expenses-home').then(m => m.ExpensesHome)
     },
-    { path: 'expenses/list', loadComponent: () =>
+    { path: 'expenses/list', canActivate: [AuthGuard], loadComponent: () => 
         import('./pages/expenses/expenses-list/expenses-list').then(m => m.ExpensesList)
     },
-    { path: 'expenses/new', loadComponent: () =>
+    { path: 'expenses/new', canActivate: [AuthGuard], loadComponent: () => 
         import('./pages/expenses/expense-create/expense-create').then(m => m.ExpenseCreate)
     },
-    { path: 'expenses/:id', loadComponent: () =>
+    { path: 'expenses/:id', canActivate: [AuthGuard], loadComponent: () => 
         import('./pages/expenses/expense-detail/expense-detail').then(m => m.ExpenseDetail)
     },
-    { path: 'balances', loadComponent: () =>
+    { path: 'balances', canActivate: [AuthGuard], loadComponent: () => 
         import('./pages/expenses/balances-global/balances-global').then(m => m.BalancesGlobal)
     },
     { path: 'events/admin', canActivate: [AuthGuard], loadComponent: () => 
@@ -44,10 +44,10 @@ export const routes: Routes = [
     { path: 'auth/set-password', loadComponent: () => 
         import('./pages/auth/set-password/set-password').then(m => m.SetPassword)
     },
-    {  path: 'shopping', loadComponent: () => 
+    {  path: 'shopping', canActivate: [AuthGuard], loadComponent: () => 
         import('./pages/shopping/shopping-list-page/shopping-list-page').then(m => m.ShoppingListPage) 
     },
-    { path: 'wallet/topup', loadComponent: () => 
+    { path: 'wallet/topup', canActivate: [AuthGuard], loadComponent: () => 
         import('./pages/wallet/topup-page/topup-page').then(m => m.TopupPage) 
     },
     { path: '', redirectTo: '/login', pathMatch: 'full' }
