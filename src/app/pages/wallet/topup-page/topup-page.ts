@@ -19,7 +19,7 @@ export class TopupPage {
 
   amount: number | null = null;  
   maxAmount = 0;
-  loading = signal(false);
+  loading = signal(true);
   msg = signal('');
 
   async ngOnInit() {
@@ -29,10 +29,42 @@ export class TopupPage {
       const { amount } = await this.svc.getMyDue(me.id);
       this.amount = amount; 
       this.maxAmount = amount;
+      this.loading.set(false);
       console.log(this.amount);
     } catch (e:any) {
+      this.loading.set(false);
       this.msg.set(e.message ?? 'Errore saldo');
     }
+  }
+
+  onKeyDown(e: KeyboardEvent) {
+    const allowed = [
+      'Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Enter'
+    ];
+
+    // Consenti numeri, punto e tasti di controllo
+    if (
+      !/[0-9.]/.test(e.key) &&
+      !allowed.includes(e.key)
+    ) {
+      e.preventDefault();
+    }
+  }
+
+  onKeyUp(e: Event) {
+    const input = e.target as HTMLInputElement;
+    let value = parseFloat(input.value);
+
+    if (isNaN(value)) {
+      value = 0;
+    }
+
+    if (value > this.maxAmount) {
+      value = this.maxAmount;
+      input.value = value.toFixed(2); // aggiorna l'input
+    }
+
+    this.amount = value; // aggiorna il model
   }
 
   async pay() {

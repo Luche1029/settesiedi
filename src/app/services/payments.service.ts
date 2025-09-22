@@ -6,12 +6,24 @@ import { supabase } from '../../../supabase/supabase.client';
 export class PaymentsService {
 
 
-  async createPaypalTopup(userId: string, amount: number) {
-    const { data, error } = await supabase.functions.invoke('payments-paypal-create', {
-      body: { user_id: userId, amount }        
+  // CREATE: ritorna { id, approvalUrl }
+  async createPaypalTopup(userId: string, amount: number, currency = 'EUR'):
+    Promise<{ id: string; approvalUrl?: string }> 
+  {
+    const { data, error } = await supabase.functions.invoke('paypal-create', {
+      body: { user_id: userId, amount, currency }
     });
     if (error) throw error;
-    return data as { id: string; approvalUrl: string };
+    return data;
+  }
+
+  // CAPTURE: input orderId (token del ritorno PayPal)
+  async capturePaypalOrder(orderId: string): Promise<any> {
+    const { data, error } = await supabase.functions.invoke('paypal-capture', {
+      body: { orderId }
+    });
+    if (error) throw error;
+    return data; // oggetto PayPal capture
   }
   
   async getMyDue(userId: string) {
