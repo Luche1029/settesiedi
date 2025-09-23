@@ -10,10 +10,13 @@ export class PaymentsService {
   async createPaypalTopup(userId: string, amount: number, currency = 'EUR'):
     Promise<{ id: string; approvalUrl?: string }> 
   {
-    const { data, error } = await supabase.functions.invoke('paypal-create', {
+    const { data, error } = await supabase.functions.invoke('payments-paypal-create', {
       body: { user_id: userId, amount, currency }
     });
-    if (error) throw error;
+    if (error) {
+      console.error('Edge error (createPaypalTopup):', error.name, error.message, error.cause, error.context);
+      throw error;
+    } 
     return data;
   }
 
@@ -22,7 +25,10 @@ export class PaymentsService {
     const { data, error } = await supabase.functions.invoke('paypal-capture', {
       body: { orderId }
     });
-    if (error) throw error;
+    if (error) {
+      console.error('Edge error (capturePaypalOrder):', error.name, error.message, error.cause, error.context);
+      throw error;
+    }     
     return data; // oggetto PayPal capture
   }
   
@@ -32,8 +38,10 @@ export class PaymentsService {
       p_from: null,   // o '2025-01-01' se vuoi filtrare
       p_to:   null
     });
-    if (error) throw error;
-    const row = Array.isArray(data) ? data[0] : data;
+    if (error) {
+      console.error('Edge error (getMyDue):', error.name, error.message, error.cause);
+      throw error;
+    }     const row = Array.isArray(data) ? data[0] : data;
     return {
       amount: Number(row?.amount) ?? 0, 
       paid:   Number(row?.paid ?? 0),
