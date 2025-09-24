@@ -180,4 +180,28 @@ export class ExpensesService {
     }));
     return rows;
   }
+
+  // ExpensesService
+  async payoutsPairs(from_user_id: string, from?: string|null, to?: string|null) {
+    let q = supabase
+      .from('payout')
+      .select('to_user_id, amount_cents, status, created_at')
+      .eq('from_user_id', from_user_id)
+      .eq('status', 'paid'); // usa solo payout riusciti
+
+    if (from) q = q.gte('created_at', from);
+    if (to)   q = q.lt('created_at', to + 'T23:59:59.999Z');
+
+    const { data, error } = await q;
+    if (error) throw error;
+
+    // mappa: to_user_id -> totale € già pagato
+    const map = new Map<string, number>();
+    for (const r of (data ?? [])) {
+      const eur = (r.amount_cents ?? 0) / 100;
+      map.set(r.to_user_id, (map.get(r.to_user_id) ?? 0) + eur);
+    }
+    return map;
+  }
+
 }

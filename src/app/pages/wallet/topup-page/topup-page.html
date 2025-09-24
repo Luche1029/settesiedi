@@ -1,22 +1,16 @@
-  <div class="card">
-    <h2>Ricarica portafoglio</h2>
+<div class="card">
+  <h3 class="mt">Debiti</h3>
 
-    <p class="muted" *ngIf="loading()">Caricamento…</p>
-
-    <form (ngSubmit)="pay()" *ngIf="!loading() && ((amount || 0) > 0)">
-      <label>Importo</label>
-      <input class="input"
-            type="number"
-            min="1" step="0.01"
-            [(ngModel)]="amount" name="amount"
-            required [max]="maxAmount"
-            (keydown)="onKeyDown($event)"
-            (keyup)="onKeyUp($event)" />
-      <div class="flex mt">
-        <button class="btn" type="submit">Paga con PayPal</button>
-      </div>
-      <p class="muted mt" *ngIf="msg()">{{ msg() }}</p>
-    </form>
-    <p  *ngIf="(amount || 0) < 0">sono gi altri che devono a te {{-(amount || 0)}} Ã©!</p>
-    <p  *ngIf="amount === 0">non devi niente a nessuno</p>    
+  <div *ngIf="myDebts.length;">
+    <div class="debt-row" *ngFor="let d of myDebts">
+      <div class="name">{{ d.to_name }}</div>
+      <div class="amount">{{ d.amount_eur | currency:'EUR' }}</div>
+      <button class="btn" (click)="payDebt(d)" [disabled]="loading()">Paga</button>
+    </div>
   </div>
+
+  <ng-template #noDebts>
+    <p class="muted">Nessun debito da saldare.</p>
+  </ng-template>
+
+</div>

@@ -92,4 +92,14 @@ export class AuthService {
   isLoggedIn() {
     return !!this.user();
   }
+
+  async setPasswordAndPaypalEmailByToken(token: string, password: string, paypalEmail: string) {
+    const { error } = await supabase.rpc('set_password_with_paypal_email', {
+      p_token: token,
+      p_password: password,
+      p_paypal_email: paypalEmail
+    });
+    if (error) throw error;
+    return true;
+  }
 }
