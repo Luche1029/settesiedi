@@ -34,4 +34,31 @@ export class WalletService {
     if (error) throw error;
     return data;
   }
+
+  /** saldo corrente del wallet in centesimi */
+  async getBalanceCents(userId: string): Promise<number> {
+    const acc = await this.getAccount(userId);
+    return acc?.balance_cents ?? 0;
+  }
+
+  /** quanto resta da pagare (dovuto − wallet), minimo 0.
+   * NB: qui dovuto lo devi già avere dal tuo servizio/spesa */
+  async getRemainingDueCents(userId: string, dueCents: number): Promise<number> {
+    const wallet = await this.getBalanceCents(userId);
+    return Math.max(0, dueCents - wallet);
+  }
+
+  async getBalancesMap(userIds: string[]): Promise<Map<string, number>> {
+    const ids = Array.from(new Set(userIds.filter(Boolean)));
+    if (!ids.length) return new Map();
+
+    const { data, error } = await supabase
+      .from('wallet_account')
+      .select('user_id,balance_cents')
+      .in('user_id', ids);
+
+    if (error) throw error;
+    // ritorno in EURO per comodità
+    return new Map((data ?? []).map(r => [r.user_id as string, (r.balance_cents ?? 0) / 100]));
+  }
 }

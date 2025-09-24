@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { supabase } from '../../../supabase/supabase.client';
 
+function slug(s: string) {
+  return s.normalize('NFKD').replace(/[^\w\s.-]/g, '').trim().replace(/\s+/g, '-').toLowerCase();
+}
+
 @Injectable({ providedIn: 'root' })
 export class ExpensesService {
 
@@ -138,5 +142,42 @@ export class ExpensesService {
     });
     if (error) throw error;
     return data || [];
+  }
+
+  async uploadReceipts(expenseId: string, files: File[], userId: string) {
+    const bucket = supabase.storage.from('receipts');
+    for (const f of files) {
+      const path = `${expenseId}/${Date.now()}-${slug(f.name || 'scontrino')}`;
+      const { error: upErr } = await bucket.upload(path, f, {
+        contentType: f.type || 'image/jpeg',
+        upsert: false
+      });
+      if (upErr) throw upErr;
+
+      const { error: insErr } = await supabase.from('expense_attachment').insert({
+        expense_id: expenseId,
+        file_path: path,
+        content_type: f.type || null,
+        uploaded_by: userId
+      });
+      if (insErr) throw insErr;
+    }
+    return true;
+  }
+  
+  async listReceipts(expenseId: string) {
+    const { data, error } = await supabase
+      .from('expense_attachment')
+      .select('id, file_path, content_type, created_at, uploaded_by')
+      .eq('expense_id', expenseId)
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+
+    const bucket = supabase.storage.from('receipts');
+    const rows = await Promise.all((data || []).map(async (r: any) => {
+      const { data: signed } = await bucket.createSignedUrl(r.file_path, 60 * 10); // 10 min
+      return { ...r, url: signed?.signedUrl || null };
+    }));
+    return rows;
   }
 }

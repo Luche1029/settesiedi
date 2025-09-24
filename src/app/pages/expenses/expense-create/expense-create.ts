@@ -3,7 +3,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { supabase } from '../../../../../supabase/supabase.client'; 
+import { supabase } from '../../../../../supabase/supabase.client';
 import { ExpensesService } from '../../../services/expenses.service';
 import { AuthService } from '../../../services/auth.service';
 
@@ -28,10 +28,15 @@ export class ExpenseCreate implements OnInit {
   notes = signal('');
   include_payer = signal(true);
 
+  // partecipanti
   users = signal<User[]>([]);
-  selected = signal<Record<string, boolean>>({}); // user_id -> checked
-  meId!: string; 
-  
+  selected = signal<Record<string, boolean>>({});
+  meId!: string;
+
+  // scontrini
+  files = signal<File[]>([]);
+  previews = signal<string[]>([]);
+
   loading = signal(false);
   msg = signal('');
 
@@ -40,16 +45,14 @@ export class ExpenseCreate implements OnInit {
     this.meId = me?.id || '';
 
     // carica utenti
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('app_user')
       .select('id, display_name')
       .order('display_name', { ascending: true });
-    if (!error && data) {
-      this.users.set(data as User[]);
 
-      if (this.meId) {
-        this.selected.set({ ...this.selected(), [this.meId]: true });
-      }
+    if (data) {
+      this.users.set(data as User[]);
+      if (this.meId) this.selected.set({ ...this.selected(), [this.meId]: true });
     }
   }
 
@@ -57,6 +60,27 @@ export class ExpenseCreate implements OnInit {
     const map: Record<string, boolean> = {};
     for (const u of this.users()) map[u.id] = checked;
     this.selected.set(map);
+  }
+
+  onToggle(userId: string, ev: Event) {
+    const checked = (ev.target as HTMLInputElement).checked;
+    this.selected.set({ ...this.selected(), [userId]: checked });
+  }
+
+  // ====== SCONTRINI ======
+  onFilesSelected(ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const list = Array.from(input.files || []);
+    const filtered = list.slice(0, 8); // limite di sicurezza
+    this.files.set(filtered);
+    // revoke vecchie preview
+    this.previews().forEach(u => URL.revokeObjectURL(u));
+    this.previews.set(filtered.map(f => URL.createObjectURL(f)));
+  }
+  clearFiles() {
+    this.files.set([]);
+    this.previews().forEach(u => URL.revokeObjectURL(u));
+    this.previews.set([]);
   }
 
   async save() {
@@ -72,7 +96,8 @@ export class ExpenseCreate implements OnInit {
 
     this.loading.set(true); this.msg.set('');
     try {
-      await this.svc.createWithParticipants({
+      // 1) crea spesa + partecipanti
+      const expense = await this.svc.createWithParticipants({
         user_id: user.id,
         amount: Number(this.amount()),
         description: this.description().trim(),
@@ -80,7 +105,14 @@ export class ExpenseCreate implements OnInit {
         notes: this.notes().trim() || null,
         include_payer: this.include_payer(),
         participants
-      });
+      }); // <-- deve ritornare { id: string, ... }
+
+      // 2) upload scontrini (se presenti)
+      if (this.files().length) {
+        await this.svc.uploadReceipts(expense.id, this.files(), user.id);
+        this.clearFiles();
+      }
+
       this.router.navigate(['/expenses/list']);
     } catch (e:any) {
       console.error('Insert expense error', e);
@@ -89,10 +121,4 @@ export class ExpenseCreate implements OnInit {
       this.loading.set(false);
     }
   }
-
-  onToggle(userId: string, ev: Event) {
-    const checked = (ev.target as HTMLInputElement).checked;
-    this.selected.set({ ...this.selected(), [userId]: checked });
-  }
-
 }

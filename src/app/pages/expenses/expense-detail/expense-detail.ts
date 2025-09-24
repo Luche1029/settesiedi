@@ -8,7 +8,8 @@ import { AuthService } from '../../../services/auth.service';
   selector: 'app-expense-detail',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  templateUrl: './expense-detail.html'
+  templateUrl: './expense-detail.html',
+  styleUrl: './expense-detail.scss'
 })
 export class ExpenseDetail implements OnInit {
   private svc = inject(ExpensesService);
@@ -17,6 +18,7 @@ export class ExpenseDetail implements OnInit {
 
   id = this.route.snapshot.paramMap.get('id')!;
   row = signal<any | null>(null);
+  receipts = signal<any[]>([]);         // <-- NEW
   loading = signal(false);
   msg = signal('');
 
@@ -43,6 +45,9 @@ export class ExpenseDetail implements OnInit {
     try {
       const data = await this.svc.get(this.id);
       this.row.set(data);
+      // carica scontrini
+      const atts = await this.svc.listReceipts(this.id);
+      this.receipts.set(atts);
     } catch (e:any) {
       this.msg.set(e.message ?? 'Errore caricamento spesa');
     } finally {
@@ -52,41 +57,20 @@ export class ExpenseDetail implements OnInit {
 
   async join() {
     const u = this.auth.user(); if (!u) { this.msg.set('Non sei loggato'); return; }
-    try {
-      await this.svc.join(this.id, u.id);
-      await this.load();
-    } catch (e:any) {
-      this.msg.set(e.message ?? 'Errore iscrizione');
-    }
+    try { await this.svc.join(this.id, u.id); await this.load(); }
+    catch (e:any) { this.msg.set(e.message ?? 'Errore iscrizione'); }
   }
-
   async leave() {
     const u = this.auth.user(); if (!u) { this.msg.set('Non sei loggato'); return; }
-    try {
-      await this.svc.leave(this.id, u.id);
-      await this.load();
-    } catch (e:any) {
-      this.msg.set(e.message ?? 'Errore rimozione');
-    }
+    try { await this.svc.leave(this.id, u.id); await this.load(); }
+    catch (e:any) { this.msg.set(e.message ?? 'Errore rimozione'); }
   }
-
   async lock() {
-    try {
-      await this.svc.setStatus(this.id, 'locked');
-      await this.load();
-    } catch (e:any) {
-      this.msg.set(e.message ?? 'Errore blocco');
-    }
+    try { await this.svc.setStatus(this.id, 'locked'); await this.load(); }
+    catch (e:any) { this.msg.set(e.message ?? 'Errore blocco'); }
   }
-
-  // expense-detail.component.ts
   async voidExpense() {
-    try {
-      await this.svc.setStatus(this.id, 'void');
-      await this.load();
-    } catch (e:any) {
-      this.msg.set(e.message ?? 'Errore annullamento');
-    }
+    try { await this.svc.setStatus(this.id, 'void'); await this.load(); }
+    catch (e:any) { this.msg.set(e.message ?? 'Errore annullamento'); }
   }
-
 }

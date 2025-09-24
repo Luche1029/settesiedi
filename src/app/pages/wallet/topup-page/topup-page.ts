@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { PaymentsService } from '../../../services/payments.service';
 import { AuthService } from '../../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { WalletService } from '../../../services/wallet.service';
 
 @Component({
   selector: 'app-topup',
@@ -18,83 +19,99 @@ export class TopupPage {
   private auth = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private wallet = inject(WalletService);
 
-  amount: number | null = null; // null = loading saldo
-  maxAmount = 0;
+  amount: number | null = null;     // € mostrati nell’input
+  maxAmount = 0;                    // € massimo ricaricabile ora (dovuto - wallet)
 
-  loading = signal(false);
+  loading = signal(true);
   msg = signal('');
 
   async ngOnInit() {
-    // 1) recupera amount dovuto (già fatto in precedenza con la tua RPC)
     const me = this.auth.user();
-    if (!me) { this.msg.set('Fai login'); this.amount = 0; return; }
-    try {
-      // chiamata alla tua RPC get_user_due_from_nets (o similare)
-      // qui ipotizzo un metodo esistente:
-      const due = await (this as any).svc.getMyDue?.(me.id);
-      const amt = Number(due?.amount ?? 0);
-      this.amount = amt;
-      this.maxAmount = amt;
-      this.loading.set(false);
-    } catch (e:any) {
-      this.msg.set(e.message ?? 'Errore saldo');
-      this.amount = 0;
-    }
+    if (!me) { this.msg.set('Fai login'); this.amount = 0; this.loading.set(false); return; }
 
-    // 2) se torni da PayPal con ?token=<orderId>, fai CAPTURE
-    const orderId = this.route.snapshot.queryParamMap.get('token'); // PayPal usa "token" per l'order id
+    // calcola quanto ricaricare (dovuto - wallet) e popola input
+    await this.refreshAmounts(me.id);
+
+    // ritorno da PayPal con ?token=<orderId>
+    const orderId = this.route.snapshot.queryParamMap.get('token');
     if (orderId) {
-      console.log("orderId", orderId);
-      await this.handleReturnFromPayPal(orderId);
+      this.msg.set('Conferma pagamento in corso…');
+      try {
+        await this.capture(orderId);
+        await this.refreshAmounts(me.id);                         // 👈 ricarica i valori dopo la capture
+        this.msg.set('Pagamento completato ✅');
+      } catch (e: any) {
+        this.msg.set(e?.message ?? 'Errore durante la conferma del pagamento');
+      } finally {
+        // pulisci la query string per evitare doppie capture al refresh
+        this.router.navigate([], { queryParams: {}, replaceUrl: true });
+      }
     }
   }
 
-  async handleReturnFromPayPal(orderId: string) {
+  /** Recupera dovuto e wallet e imposta amount/maxAmount (in €) */
+  private async refreshAmounts(userId: string) {
     this.loading.set(true);
-    this.msg.set('Conferma pagamento in corso…');
-    console.log('Conferma pagamento in corso…');
     try {
-      const capture = await this.svc.capturePaypalOrder(orderId);
-      // opzionale: verifica capture.status === 'COMPLETED'
-      this.msg.set('Pagamento completato ✅');
-      console.log('Pagamento completato');
-      // pulisci la querystring per evitare doppie capture al refresh
-      this.router.navigate([], { queryParams: {}, replaceUrl: true });
-      // opzionale: ricarica saldo / amount
-      // await this.ngOnInit();
-    } catch (e:any) {
-      console.error('CAPTURE error', e);
-      this.msg.set(e.message ?? 'Errore nella conferma del pagamento');
+      const [dueCents, walletCents] = await Promise.all([
+        this.getMyDueCents(userId),
+        this.wallet.getBalanceCents(userId),
+      ]);
+      const remaining = Math.max(0, dueCents - walletCents);
+      this.maxAmount = +(remaining / 100).toFixed(2);
+      this.amount = this.maxAmount; // mostriamo quanto serve per azzerare il debito
+      this.msg.set('');
+    } catch (e: any) {
+      this.msg.set(e?.message ?? 'Errore nel calcolo del saldo');
+      this.amount = 0;
+      this.maxAmount = 0;
     } finally {
       this.loading.set(false);
     }
+  }
+
+  /** Prova a usare metodi esistenti nel tuo PaymentsService, senza inventare backend */
+  private async getMyDueCents(userId: string): Promise<number> {
+    // 1) se esiste un metodo dedicato in cents
+    const anySvc = this.svc as any;
+    if (typeof anySvc.getMyDueCents === 'function') {
+      const v = await anySvc.getMyDueCents(userId);
+      return Number(v ?? 0);
+    }
+    // 2) se esiste getMyDue che ritorna { amount } in euro
+    if (typeof anySvc.getMyDue === 'function') {
+      const res = await anySvc.getMyDue(userId);
+      const euro = Number(res?.amount ?? 0);
+      return Math.round(euro * 100);
+    }
+    // 3) altrimenti 0 (non rompiamo il flusso)
+    return 0;
+  }
+
+  private async capture(orderId: string) {
+    await this.svc.capturePaypalOrder(orderId);
   }
 
   async pay() {
     const me = this.auth.user(); if (!me) { this.msg.set('Fai login'); return; }
     if (this.amount === null || this.amount <= 0) { this.msg.set('Nessun importo da pagare'); return; }
 
-    // non permettere di superare maxAmount
-    const toPay = Math.min(this.amount, this.maxAmount);
-
+    const toPay = Math.min(this.amount, this.maxAmount); // non superare il necessario
     this.loading.set(true); this.msg.set('');
     try {
       const { approvalUrl } = await this.svc.createPaypalTopup(me.id, Number(toPay.toFixed(2)));
-      if (approvalUrl) {
-        window.location.href = approvalUrl; // redirect a PayPal
-      } else {
-        this.msg.set('Errore: approval URL mancante');
-      }
-    } catch (e:any) {
-      this.msg.set(e.message ?? 'Errore creazione pagamento');
+      if (approvalUrl) window.location.href = approvalUrl;
+      else this.msg.set('Errore: approval URL mancante');
+    } catch (e: any) {
+      this.msg.set(e?.message ?? 'Errore creazione pagamento');
     } finally {
-      // NB: dopo il redirect non serve, ma se l’utente resta qui…
-      this.loading.set(false);
+      this.loading.set(false); // se l’utente resta qui
     }
   }
 
-  // (opzionali) i due handler input che avevi chiesto:
+  // Hard cap e validazione live dell’input
   onKeyDown(e: KeyboardEvent) {
     const allowed = ['Backspace','Tab','ArrowLeft','ArrowRight','Delete','Enter',',','.'];
     if (!/[0-9]/.test(e.key) && !allowed.includes(e.key)) e.preventDefault();

@@ -8,15 +8,34 @@
 
   <div class="mt">
     <span class="badge">Iscritti: {{ row()?.participants_count || 0 }}</span>
-    <ul class="mt" *ngIf="row()?.participants_names?.length">
+    <ul class="mt" *ngIf="row()?.participants_names?.length" style="list-style:none; padding-left:0;">
       <li *ngFor="let n of row()?.participants_names">{{ n }}</li>
     </ul>
   </div>
 
-  <div class="mt">
+  <div class="buttons">
     <button class="btn" (click)="join()" *ngIf="!joined()">Iscrivimi</button>
     <button class="btn secondary" (click)="leave()" *ngIf="joined()">Rimuovimi</button>
-    <button class="btn ghost ml" (click)="lock()" *ngIf="canLock">Blocca</button>
-    <button class="btn danger ml" (click)="voidExpense()" *ngIf="canVoid">Annulla</button>
+    <button class="btn ghost" (click)="lock()" *ngIf="canLock">Blocca</button>
+    <button class="btn danger" (click)="voidExpense()" *ngIf="canVoid">Annulla</button>
+  </div>
+
+  <!-- Scontrini -->
+  <div class="mt">
+    <h3>Scontrini</h3>
+
+    <p class="muted" *ngIf="!receipts().length">Nessun allegato.</p>
+
+    <div class="grid" *ngIf="receipts().length">
+      <a class="card" *ngFor="let a of receipts()"
+         [href]="a.url" target="_blank" rel="noopener"
+         style="display:block; padding:8px; text-align:center;">
+        <img [src]="a.url" alt="scontrino"
+             style="width:100%; height:180px; object-fit:cover; border-radius:12px;" />
+        <small class="muted" style="display:block; margin-top:6px">
+          {{ a.created_at | date:'short' }}
+        </small>
+      </a>
+    </div>
   </div>
 </div>

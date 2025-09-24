@@ -48,33 +48,68 @@
       </div>
     </div>
 
-  <div class="card mt">
-    <div class="flex" style="justify-content:space-between; align-items:center;">
-      <h3 style="margin:0">Partecipanti</h3>
-      <div class="flex" style="gap:8px;">
-        <button class="btn ghost" type="button" (click)="toggleAll(true)">Seleziona tutti</button>
-        <button class="btn ghost" type="button" (click)="toggleAll(false)">Nessuno</button>
+    <!-- PARTECIPANTI -->
+    <div class="card mt">
+      <div class="flex" style="justify-content:space-between; align-items:center;">
+        <h3 style="margin:0">Partecipanti</h3>
+        <div class="flex" style="gap:8px;">
+          <button class="btn ghost" type="button" (click)="toggleAll(true)">Seleziona tutti</button>
+          <button class="btn ghost" type="button" (click)="toggleAll(false)">Nessuno</button>
+        </div>
+      </div>
+
+      <div class="grid mt">
+        <label
+          *ngFor="let u of users()"
+          class="card"
+          [class.is-me]="u.id === meId"
+          style="display:flex; align-items:center; gap:10px;">
+          <input
+            type="checkbox"
+            [attr.name]="'sel_'+u.id"
+            [checked]="!!selected()[u.id]"
+            (change)="onToggle(u.id, $event)" />
+          <span>
+            {{ u.display_name }}
+            <small *ngIf="u.id === meId" class="muted">(TU)</small>
+          </span>
+        </label>
       </div>
     </div>
 
-    <div class="grid mt">
-      <label
-        *ngFor="let u of users()"
-        class="card"
-        [class.is-me]="u.id === meId"
-        style="display:flex; align-items:center; gap:10px;">
-        <input
-          type="checkbox"
-          [attr.name]="'sel_'+u.id"
-          [checked]="!!selected()[u.id]"
-          (change)="onToggle(u.id, $event)" />
-        <span>
-          {{ u.display_name }}
-          <small *ngIf="u.id === meId" class="muted">(TU)</small>
-        </span>
-      </label>
+    <!-- SCONTRINO -->
+    <div class="card mt">
+      <div class="flex" style="justify-content:space-between; align-items:center;">
+        <h3 style="margin:0">Scontrino</h3>
+        <small class="muted">Carica un'immagine o scatta una foto</small>
+      </div>
+
+      <div class="flex mt" style="gap:12px; flex-wrap:wrap">
+        <label class="btn secondary" style="cursor:pointer">
+          Carica file
+          <input type="file" accept="image/*" multiple hidden
+                 (change)="onFilesSelected($event)" />
+        </label>
+
+        <label class="btn ghost" style="cursor:pointer">
+          Scatta foto
+          <input type="file" accept="image/*" capture="environment" hidden
+                 (change)="onFilesSelected($event)" />
+        </label>
+
+        <button type="button" class="btn ghost" (click)="clearFiles()" *ngIf="files().length">
+          Rimuovi selezione
+        </button>
+      </div>
+
+      <!-- preview -->
+      <div class="grid mt" *ngIf="files().length">
+        <div class="card" *ngFor="let p of previews(); let i = index" style="text-align:center">
+          <img [src]="p" alt="scontrino" style="max-width:100%; height:auto; border-radius:12px" />
+          <small class="muted" style="display:block; margin-top:6px">{{ files()[i]?.name }}</small>
+        </div>
+      </div>
     </div>
-  </div>
 
     <button class="btn mt" type="submit" [disabled]="loading()">Salva</button>
     <small class="muted ml" *ngIf="msg()">{{ msg() }}</small>
