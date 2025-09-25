@@ -1,0 +1,23 @@
+.debt-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+
+.debt-row {
+    position: relative;
+    display: flex;
+    gap: 11px;
+    align-content: center;
+    align-items: center;
+    font-size: 15pt;
+
+    input {
+        width:155px;
+    }
+    button {
+        position: absolute;
+        width:155px;
+        right:11px;
+    }
+}

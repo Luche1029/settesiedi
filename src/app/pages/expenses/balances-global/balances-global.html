@@ -26,8 +26,10 @@
       <thead>
         <tr>
           <th class="sticky-col"></th>
-          <th>Pagato</th>
-          <th>Dovuto</th>
+          <th>Spese pagate</th>
+          <th>Spese da pagare</th>
+          <th>Versati</th>
+          <th>Ricevuti</th>
           <th>Netto</th>
         </tr>
       </thead>
@@ -37,6 +39,8 @@
           <td class="sticky-col">{{ r.display_name }}</td>
           <td>{{ r.paid | currency:'EUR' }}</td>
           <td>{{ r.owed  | currency:'EUR' }}</td>
+          <td>{{ r.payouts_sent  | currency:'EUR' }}</td>
+          <td>{{ r.payouts_recv  | currency:'EUR' }}</td>
           <td [class.positive]="r.net >= 0" [class.negative]="r.net < 0">
             {{ r.net | currency:'EUR' }}
           </td>
@@ -48,8 +52,10 @@
       <thead>
         <tr>
           <th class="sticky-col"></th>
-          <th>Pagato</th>
-          <th>Dovuto</th>
+          <th>Spese pagate</th>
+          <th>Spese da pagare</th>
+          <th>Versati</th>
+          <th>Ricevuti</th>
           <th>Netto</th>
         </tr>
       </thead>
@@ -59,6 +65,8 @@
           <td class="sticky-col">{{ r.display_name }}</td>
           <td>{{ r.paid | currency:'EUR' }}</td>
           <td>{{ r.owed  | currency:'EUR' }}</td>
+          <td>{{ r.payouts_sent  | currency:'EUR' }}</td>
+          <td>{{ r.payouts_recv  | currency:'EUR' }}</td>
           <td [class.positive]="r.net >= 0" [class.negative]="r.net < 0">
             {{ r.net | currency:'EUR' }}
           </td>

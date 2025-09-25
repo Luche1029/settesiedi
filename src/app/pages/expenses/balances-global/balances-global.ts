@@ -45,44 +45,21 @@ export class BalancesGlobal implements OnInit {
   msg = signal('');
 
   async ngOnInit() { await this.refresh(); }
+
 async refresh() {
   this.loading.set(true); this.msg.set('');
   try {
-    const [nRaw, sRaw] = await Promise.all([
-      this.svc.nets(this.from(), this.to()),
-      this.svc.settlements(this.from(), this.to())
+    const [balances, settles] = await Promise.all([
+      this.svc.userBalances(),     // già sulla v_user_balances
+      this.svc.settlementsMin(),   // 👈 nuova vista
     ]);
-
-    const n = nRaw || [];
-    const s = sRaw || [];
-
-    // mappa display_name -> user_id dai Netti (serve per i settlements che non hanno from_user_id)
-    const nameToId = new Map<string, string>();
-    for (const r of n) {
-      if (r?.display_name && r?.user_id) {
-        nameToId.set(String(r.display_name).trim(), String(r.user_id));
-      }
-    }
-
-    // ids da cui leggere i saldi:
-    // - tutti gli user_id presenti nei netti
-    // - e gli id ricavati dai nomi dei debitori nei settlements
-    const netIds: string[] = n.map((r: any) => r.user_id).filter(Boolean);
-    const settDebtorIdsByName: string[] = s
-      .map((r: any) => (r.from_user_id || nameToId.get(String(r.from ?? r.from_name ?? '').trim())))
-      .filter(Boolean) as string[];
-    const allIds = Array.from(new Set([...netIds, ...settDebtorIdsByName]));
-
-    // una sola lettura dei saldi
-    const balances = await this.wallet.getBalancesMap(allIds); // Map<user_id, euro>
-
-    // allinea Netti (NON consuma)
-    const alignedNets = this.alignNetsWithWallet(n, balances);
-    this.nets.set(alignedNets);
-
-    // allinea Settlements (CONSUMA il wallet del debitore)
-    const alignedSetts = this.alignSettlementsWithWallet(s, balances, nameToId);
-    this.settlements.set(alignedSetts);
+    this.nets.set((balances || []).map((r:any)=>({
+      display_name: r.display_name,
+      paid:  r.paid_expenses,
+      owed:  r.owed_expenses,
+      net:   r.net,
+    })));
+    this.settlements.set(settles || []);  // passa direttamente alla SettlementsList
   } catch (e:any) {
     this.msg.set(e.message ?? 'Errore caricamento bilanci');
   } finally {

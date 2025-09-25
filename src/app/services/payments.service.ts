@@ -7,17 +7,19 @@ export class PaymentsService {
 
 
   // CREATE: ritorna { id, approvalUrl }
-  async createPaypalTopup(userId: string, amount: number, currency = 'EUR'):
-    Promise<{ id: string; approvalUrl?: string }> 
-  {
+  async createPaypalTopup(userId: string, amount: number, currency = 'EUR') {
+    // DEBUG: vedi cosa stai per inviare
+    console.log('createPaypalTopup payload →', { user_id: userId, amount, currency });
+
     const { data, error } = await supabase.functions.invoke('payments-paypal-create', {
       body: { user_id: userId, amount, currency }
     });
+
     if (error) {
-      console.error('Edge error (createPaypalTopup):', error.name, error.message, error.cause, error.context);
+      console.error('createPaypalTopup error', error);
       throw error;
-    } 
-    return data;
+    }
+    return data as { id: string; approvalUrl: string | null };
   }
 
   // CAPTURE: input orderId (token del ritorno PayPal)

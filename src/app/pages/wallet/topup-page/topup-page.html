@@ -1,15 +1,23 @@
 <div class="card">
   <h3 class="mt">Debiti</h3>
 
-  <div *ngIf="myDebts.length;">
-    <div class="debt-row" *ngFor="let d of myDebts">
-      <div class="name">{{ d.to_name }}</div>
-      <div class="amount">{{ d.amount_eur | currency:'EUR' }}</div>
-      <button class="btn" (click)="payDebt(d)" [disabled]="loading()">Paga</button>
+  <div *ngIf="myDebts.length;" class="debt-wrapper">
+    <div class="debt-row" *ngFor="let d of myDebts; let i = index">
+      →<div class="name">{{ d.to_name }}</div>
+      <input 
+        type="number" 
+        step="0.01" 
+        min="0"
+        max="{{d.max_amount}}" 
+        name="debt{{i}}"
+        value="{{d.amount_eur}}" 
+        (keydown)="onKeyDown($event)"
+         (keyup)="onKeyUp($event, d)"/>
+      <button class="btn" (click)="payDebt(d)" [disabled]="loading()">Paga {{ d.amount_eur | currency:'EUR' }}</button>
     </div>
   </div>
 
-  <ng-template #noDebts>
+  <ng-template *ngIf="myDebts.length < 1;">
     <p class="muted">Nessun debito da saldare.</p>
   </ng-template>
 

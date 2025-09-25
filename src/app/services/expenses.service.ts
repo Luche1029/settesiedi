@@ -121,11 +121,13 @@ export class ExpensesService {
     if (error) throw error;
     return Number(data || 0);
   }
+
   async totalsByPayer(from: string|null, to: string|null) {
     const { data, error } = await supabase.rpc('total_expenses_by_payer', { p_from: from, p_to: to });
     if (error) throw error;
     return data || [];
   }
+
   async nets(from: string|null, to: string|null) {
     const { data, error } = await supabase.rpc('expense_nets', {
       p_from: this.normDate(from),
@@ -202,6 +204,41 @@ export class ExpensesService {
       map.set(r.to_user_id, (map.get(r.to_user_id) ?? 0) + eur);
     }
     return map;
+  }
+
+  /** Balances (per utente) dalla view */
+  async userBalances() {
+    const { data, error } = await supabase
+      .from('v_user_balances')     // 👈 nuova view
+      .select('*')
+      .order('net', { ascending: false })
+      .order('display_name', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  /** Settlements netti dalla view (debtor -> creditor) */
+  async settlementsNet() {
+    const { data, error } = await supabase
+      .from('v_expense_settlements_net')  // 👈 nuova view coppie
+      .select('*')
+      .order('from_name', { ascending: true })
+      .order('to_name', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  // src/app/services/expenses.service.ts
+  async settlementsMin() {
+    const { data, error } = await supabase
+      .from('v_expense_settlements_min')   // debtor → creditor, lista minima
+      .select('*')
+      .order('from_name', { ascending: true })
+      .order('to_name',   { ascending: true });
+    if (error) throw error;
+    return data || [];
   }
 
 }

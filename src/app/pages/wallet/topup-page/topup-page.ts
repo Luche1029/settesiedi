@@ -22,93 +22,89 @@ export class TopupPage {
   private router = inject(Router);
   private wallet = inject(WalletService);
   private expenses = inject(ExpensesService);     
-
-  amount: number | null = null;     // € mostrati nell’input
-  maxAmount = 0;                    // € massimo ricaricabile ora (dovuto - wallet)
+ 
 
   loading = signal(true);
   msg = signal('');
 
-  myDebts: Array<{ to_user_id: string; to_name: string; amount_eur: number }> = [];
+  myDebts: Array<{ to_user_id: string; to_name: string; amount_eur: number, max_amount: number }> = [];
 
   async ngOnInit() {
     const me = this.auth.user();
-    if (!me) { this.msg.set('Fai login'); this.amount = 0; this.loading.set(false); return; }
+    if (!me) { this.msg.set('Fai login'); this.loading.set(false); return; }
 
-    // calcola quanto ricaricare (dovuto - wallet) e popola input
     await this.loadMyDebts(me.id); 
 
-    // ritorno da PayPal con ?token=<orderId>
     const orderId = this.route.snapshot.queryParamMap.get('token');
     if (orderId) {
       this.msg.set('Conferma pagamento in corso…');
       try {
-        await this.capture(orderId);                  // 👈 ricarica i valori dopo la capture
+        await this.capture(orderId);                  
         this.msg.set('Pagamento completato ✅');
       } catch (e: any) {
         this.msg.set(e?.message ?? 'Errore durante la conferma del pagamento');
       } finally {
-        // pulisci la query string per evitare doppie capture al refresh
         this.router.navigate([], { queryParams: {}, replaceUrl: true });
       }
     }
-    this.loading.set(false);
   }
 
   /** Debiti per-creditore dove io sono il debitore */
   private async loadMyDebts(userId: string) {
-    const all = await this.expenses.settlements(null, null);
-
-    // base: debiti lordi (from_user → to_user)
-    let debts = (all ?? [])
-      .filter((r: any) => String(r.from_user) === userId)
+    const all = await this.expenses.settlementsMin();
+    this.myDebts = (all ?? [])
+      .filter((r: any) => String(r.from_user) === userId)   // io debitore
       .map((r: any) => ({
         to_user_id: String(r.to_user),
-        to_name: String(r.to_name ?? r.to ?? '').trim(),
-        amount_eur: Number(r.amount ?? 0)
-      }));
-
-    // sottraggo i payout 'paid' per coppia (from=userId → to_user)
-    const paidPairs = await this.expenses.payoutsPairs(userId, null, null);
-    debts = debts.map((d: { to_user_id: string; amount_eur: number; }) => {
-      const already = paidPairs.get(d.to_user_id) ?? 0;
-      const remaining = Math.max(0, d.amount_eur - already);
-      return { ...d, amount_eur: +remaining.toFixed(2) };
-    }).filter((d: { amount_eur: number; }) => d.amount_eur > 0);
-
-    this.myDebts = debts;
+        to_name:    String(r.to_name || '').trim(),
+        amount_eur: Number(r.amount || 0),
+        max_amount: Number(r.amount || 0),
+      }))
+      .filter((r:any) => r.amount_eur > 0);
+      this.loading.set(false);
   }
 
 
-    /** Paga un singolo debito usando il wallet (PayPal Payout in edge) */
-  async payDebt(d: { to_user_id: string; to_name: string; amount_eur: number }) {
-    const me = this.auth.user(); if (!me) { this.msg.set('Fai login'); return; }
+  /** Paga un singolo debito usando il wallet (PayPal Payout in edge) */
+  async payDebt(d: { to_user_id: string; to_name: string; amount_eur: number; max_amount: number }) {
+    const me = this.auth.user(); 
+    if (!me) { this.msg.set('Fai login'); return; }
+
+    // clamp & validazione
+    let amount = Number.isFinite(d.amount_eur) ? d.amount_eur : 0;
+    amount = Math.max(0, Math.min(amount, d.max_amount));        // cap per-riga
+    amount = Math.floor(amount * 100) / 100;                      // max 2 decimali
+    if (amount <= 0) { this.msg.set('Importo non valido.'); return; }
+
+    const amount_cents = Math.round(amount * 100);
+    console.log("amount_cents", amount_cents);
 
     this.loading.set(true);
     try {
-      const amount_cents = Math.round(d.amount_eur * 100);
-      const walletCents  = await this.wallet.getBalanceCents(me.id);
 
-      if (walletCents < amount_cents) {
-        const delta = ((amount_cents - walletCents) / 100).toFixed(2);
-        this.msg.set(`Saldo insufficiente. Ti mancano € ${delta}. Ricarica prima di pagare.`);
-        this.loading.set(false);
-        return;
-      }
 
-      // chiama edge function: scrive payout + wallet_tx negativo
-      await this.wallet.payout(me.id, '', amount_cents, `Saldo a ${d.to_name}`, d.to_user_id);
+      // Edge Function: crea payout + wallet_tx(-)
+      await this.wallet.payout(
+        me.id,
+        '',                                 // email PayPal del creditore gestita server-side (o lascia vuoto se mappata dal to_user_id)
+        amount_cents,
+        `Saldo a ${d.to_name}`,
+        d.to_user_id
+      );
 
-      // refresh UI (saldo, input, lista pendenze)
+      // Aggiorna UI: riduci il residuo della riga e ricarica elenco
+      d.max_amount = Math.max(0, +(d.max_amount - amount).toFixed(2));
+      d.amount_eur = Math.min(d.amount_eur, d.max_amount);
       await this.loadMyDebts(me.id);
 
-      this.msg.set(`Pagamento inviato a ${d.to_name} ✅`);
-    } catch (e:any) {
+      this.msg.set(`Pagamento di € ${amount.toFixed(2)} inviato a ${d.to_name} ✅`);
+    } catch (e: any) {
       this.msg.set(e?.message ?? 'Errore payout');
     } finally {
       this.loading.set(false);
     }
   }
+
   
   private async capture(orderId: string) {
     await this.svc.capturePaypalOrder(orderId);
@@ -119,14 +115,19 @@ export class TopupPage {
     const allowed = ['Backspace','Tab','ArrowLeft','ArrowRight','Delete','Enter',',','.'];
     if (!/[0-9]/.test(e.key) && !allowed.includes(e.key)) e.preventDefault();
   }
-  onKeyUp(e: Event) {
+  onKeyUp(e: Event, d: { amount_eur: number; max_amount: number }) {
     const input = e.target as HTMLInputElement;
     let value = parseFloat(input.value.replace(',', '.'));
     if (isNaN(value)) value = 0;
-    if (value > this.maxAmount) {
-      value = this.maxAmount;
+
+    // hard cap
+    if (value > d.max_amount) {
+      value = d.max_amount;
       input.value = value.toFixed(2);
     }
-    this.amount = value;
+
+    // aggiorna il modello
+    d.amount_eur = value;
   }
+
 }
