@@ -35,25 +35,20 @@ export class WalletService {
   }
 
   // Edge Function di payout (es. 'payments-paypal-payout')
-  async payout(
-      from_user_id: string,
-      to_user_id: string,
-      amount_cents: number,
-      note?: string,
-      to_paypal_email?: string
-    ): Promise<PayoutResponse> {
-      const body = { from_user_id, to_user_id, amount_cents, note, to_paypal_email };
-      // debug utile:
-      console.log('payout →', body);
-
-      const { data, error } = await supabase.functions.invoke('payments-paypal-create', { body });
-      if (error) {
-        console.error('payout error', error);
-        // supabase.functions error ha spesso .message o .context
-        throw new Error((error as any)?.message || 'Errore payout');
-      }
-      return (data ?? {}) as PayoutResponse;
-    }
+  async payout(params: {
+    from_user_id: string;
+    to_user_id?: string;        // o email
+    to_paypal_email?: string;   // opzionale: se non c'è user_id
+    amount_cents: number;
+    note?: string;
+  }) {
+    console.log('payout →', params); // debug
+    const { data, error } = await supabase.functions.invoke('payments-paypal-payout', {
+      body: params
+    });
+    if (error) throw error;
+    return data;
+  }
 
   /** saldo corrente del wallet in centesimi */
   async getBalanceCents(userId: string): Promise<number> {

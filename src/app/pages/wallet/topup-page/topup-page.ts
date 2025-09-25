@@ -84,13 +84,12 @@ export class TopupPage {
 
 
       // Edge Function: crea payout + wallet_tx(-)
-      await this.wallet.payout(
-        me.id,
-        '',                                 // email PayPal del creditore gestita server-side (o lascia vuoto se mappata dal to_user_id)
-        amount_cents,
-        `Saldo a ${d.to_name}`,
-        d.to_user_id
-      );
+      await this.wallet.payout({
+        from_user_id: me.id,
+        to_user_id: d.to_user_id,          // oppure to_paypal_email: 'dest@example.com'
+        amount_cents: Math.round(d.amount_eur * 100),
+        note: `Saldo a ${d.to_name}`
+      });
 
       // Aggiorna UI: riduci il residuo della riga e ricarica elenco
       d.max_amount = Math.max(0, +(d.max_amount - amount).toFixed(2));
