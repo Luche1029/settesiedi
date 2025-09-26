@@ -22,6 +22,27 @@ export class PaymentsService {
     return data as { id: string; approvalUrl: string | null };
   }
 
+  async createDebtSettlementOrder(
+    fromUserId: string, 
+    toUserId: string, // NUOVO PARAMETRO
+    amount: number, 
+    currency = 'EUR'
+) {
+    const { data, error } = await supabase.functions.invoke('payments-paypal-create', {
+      body: { 
+          user_id: fromUserId, 
+          to_user_id: toUserId, // PASSATO
+          amount, 
+          currency 
+        }
+      });
+        if (error) {
+      console.error('createPaypalTopup error', error);
+      throw error;
+    }
+    return data as { id: string; approvalUrl: string | null };
+}
+
   // CAPTURE: input orderId (token del ritorno PayPal)
   async capturePaypalOrder(orderId: string): Promise<any> {
     const { data, error } = await supabase.functions.invoke('paypal-capture', {

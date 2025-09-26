@@ -15,6 +15,7 @@
          (keyup)="onKeyUp($event, d)"/>
       <button class="btn" (click)="payDebt(d)" [disabled]="loading()">Paga {{ d.amount_eur | currency:'EUR' }}</button>
     </div>
+    {{msg()}}
   </div>
 
   <ng-template *ngIf="myDebts.length < 1;">
