@@ -2,58 +2,67 @@
   <h2>Chi sei?</h2>
   <p class="muted">Se è la prima volta, imposterai la password via link.</p>
 
-  <!-- Grid dei profili -->
+  <!-- Grid profili -->
   <div class="grid mt" *ngIf="!selected()">
-    <button class="event-card" *ngFor="let u of profiles()" (click)="pick(u)" style="text-align:left;">
-        <div class="flex" style="align-items:center; gap:12px;">
-            <img
-            [src]="u.avatar_url || ('https://ui-avatars.com/api/?name=' + encodeName(u.display_name) + '&background=EFEFFA&color=150e7a')"
-            [alt]="u.display_name"
-            width="52" height="52"
-            style="border-radius:50%; border:1px solid var(--hairline);" />
+    <button class="event-card"
+            *ngFor="let u of profiles()"
+            (click)="pick(u)"
+            style="text-align:left; cursor:pointer;">
+      <div class="flex" style="align-items:center; gap:12px;">
+        <img
+          [src]="u.avatarUrl || ('https://ui-avatars.com/api/?name=' + encodeName(u.display_name) + '&background=EFEFFA&color=150e7a')"
+          [alt]="u.display_name"
+          width="52" height="52"
+          style="border-radius:50%; border:1px solid var(--hairline);" />
 
-            <div>
-            <div class="title">{{ u.display_name }}</div>
-            <small class="muted">{{ u.email }}</small>
-            </div>
+        <div>
+          <div class="title">{{ u.display_name }}</div>
+          <small class="muted">{{ u.email || '—' }}</small>
         </div>
+      </div>
 
-        <div class="mt">
-            <span class="badge" *ngIf="!u.password_hash">Prima volta</span>
-            <span class="badge ocra" *ngIf="u.password_hash">Password impostata</span>
-        </div>
-        </button>
-
+      <div class="mt">
+        <span class="badge" *ngIf="!u.password_hash">Prima volta</span>
+        <span class="badge ocra" *ngIf="u.password_hash">Password impostata</span>
+      </div>
+    </button>
   </div>
 
   <!-- Dettaglio profilo selezionato -->
   <div *ngIf="selected()" class="mt">
-    <div class="flex" style="align-items:flex-start; gap:12px;flex-direction: column;">
-      
+    <div class="flex" style="align-items:flex-start; gap:12px; flex-direction:column;">
       <h3>{{ selected()?.display_name }}</h3>
-      <span class="muted">({{ selected()?.email }})</span>
+      <span class="muted">({{ selected()?.email || '—' }})</span>
     </div>
 
     <!-- Prima volta: invia link -->
     <div *ngIf="firstTime()" class="mt">
       <button class="btn" (click)="sendSetup()" [disabled]="loading()">Invia link per impostare password</button>
       <p class="muted mt">Riceverai un link per creare la password.</p>
+      <p *ngIf="link()" class="mt">
+        <a [href]="link()!" target="_blank" rel="noopener">{{ link() }}</a>
+      </p>
+      <button class="btn ghost mt" (click)="back()">← Indietro</button>
     </div>
 
     <!-- Altrimenti: password -->
     <div *ngIf="!firstTime()" class="form-row cols-3 mt">
       <div>
         <label>Password</label>
-        <input class="input" type="password" [(ngModel)]="password" placeholder="••••••" />
+        <input class="input"
+               type="password"
+               name="pwd"
+               [ngModel]="password()"
+               (ngModelChange)="password.set($event)"
+               placeholder="••••••" />
       </div>
-      <div class="buttons">
-        <button class="btn ghost" (click)="back()">← Indietro</button>
-        <button class="btn" (click)="login()" [disabled]="!password() || loading()">Entra</button>
+      <div class="buttons" style="display:flex; gap:8px; align-items:end;">
+        <button class="btn ghost" type="button" (click)="back()">← Indietro</button>
+        <button class="btn" type="button" (click)="login()" [disabled]="!password() || loading()">Entra</button>
       </div>
     </div>
   </div>
 
   <p *ngIf="msg()" class="mt">{{ msg() }}</p>
-  <a *ngIf="link" href="{{link}}">{{link}}</a>
   <p *ngIf="loading()" class="mt muted">Attendere…</p>
 </div>

@@ -207,16 +207,24 @@ export class ExpensesService {
   }
 
   /** Balances (per utente) dalla view */
-  async userBalances() {
-    const { data, error } = await supabase
-      .from('v_user_balances')     // 👈 nuova view
-      .select('*')
-      .order('net', { ascending: false })
-      .order('display_name', { ascending: true });
+async userBalances() {
+  const { data, error } = await supabase
+    .from('v_user_balances')
+    .select(`
+      user_id,
+      display_name,
+      paid_expenses,
+      owed_expenses,
+      net_expenses,
+      payout_sent_eur,
+      payout_recv_eur,
+      balance
+    `);
+  if (error) throw error;
+  return data ?? [];
+}
 
-    if (error) throw error;
-    return data || [];
-  }
+
 
   /** Settlements netti dalla view (debtor -> creditor) */
   async settlementsNet() {
@@ -233,12 +241,15 @@ export class ExpensesService {
   // src/app/services/expenses.service.ts
   async settlementsMin() {
     const { data, error } = await supabase
-      .from('v_expense_settlements_min')   // debtor → creditor, lista minima
-      .select('*')
-      .order('from_name', { ascending: true })
-      .order('to_name',   { ascending: true });
+      .from('v_expense_settlements_min')
+      .select(`from_user,
+        from_name,
+        to_user,
+        to_name,
+        amount`);   // 👈 niente from_name/to_name
     if (error) throw error;
     return data || [];
   }
+
 
 }

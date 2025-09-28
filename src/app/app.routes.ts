@@ -5,6 +5,9 @@ export const routes: Routes = [
     { path: 'login', loadComponent: () => 
         import('./pages/auth/login-grid/login-grid').then(m => m.LoginGrid) 
     },  
+    { path: 'account', canActivate: [AuthGuard], loadComponent: () => 
+        import('./pages/account/account').then(m => m.Account) 
+    },
     { path: 'menus', canActivate: [AuthGuard], loadComponent: () => 
         import('./pages/menus/weekly-menus/weekly-menus').then(m => m.WeeklyMenus) 
     },

@@ -1,0 +1,16 @@
+.admin-menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 15px;
+    gap:15px;
+    margin-top: 15px;
+
+    a {
+        width: 100%;
+        text-align: center;   
+        cursor: pointer;    
+        text-decoration: none;    
+        color: #232323;
+    }
+}

@@ -46,26 +46,48 @@ export class BalancesGlobal implements OnInit {
 
   async ngOnInit() { await this.refresh(); }
 
-async refresh() {
-  this.loading.set(true); this.msg.set('');
-  try {
-    const [balances, settles] = await Promise.all([
-      this.svc.userBalances(),     // già sulla v_user_balances
-      this.svc.settlementsMin(),   // 👈 nuova vista
-    ]);
-    this.nets.set((balances || []).map((r:any)=>({
-      display_name: r.display_name,
-      paid:  r.paid_expenses,
-      owed:  r.owed_expenses,
-      net:   r.net,
-    })));
-    this.settlements.set(settles || []);  // passa direttamente alla SettlementsList
-  } catch (e:any) {
-    this.msg.set(e.message ?? 'Errore caricamento bilanci');
-  } finally {
-    this.loading.set(false);
+  async refresh() {
+    this.loading.set(true); this.msg.set('');
+    try {
+      // 1) prendo balances (contiene user_id e display_name) e settlements min (solo IDs)
+      const [balances, settles] = await Promise.all([
+        this.svc.userBalances(),   // deve restituire: { user_id, display_name, paid_expenses, owed_expenses, balance, ... }
+        this.svc.settlementsMin(), // restituisce: { from_user, to_user, amount }
+      ]);
+
+      // 2) mappa ID -> Nome
+      const idToName = new Map<string, string>(
+        (balances || []).map((b: any) => [String(b.user_id), String(b.display_name)])
+      );
+
+      // 3) Netti per tabella in alto
+      this.nets.set((balances || []).map((r: any) => ({
+        user_id:      String(r.user_id),
+        display_name: String(r.display_name),
+        paid:         Number(r.paid_expenses ?? r.paid ?? 0),
+        owed:         Number(r.owed_expenses ?? r.owed ?? 0),
+        payouts_sent:         Number(r.payout_sent_eur ?? r.paid ?? 0),
+        payouts_recv:         Number(r.payout_recv_eur ?? r.owed ?? 0),
+        net:          Number(r.balance ?? 0),
+      })));
+
+      // 4) Chi deve a chi (mappo ID → nome qui, così la SettlementsList non dipende più da from_name/to_name)
+      const rows = (settles || []).map((s: any) => ({
+        from:        idToName.get(String(s.from_user)) ?? String(s.from_user),
+        to:          idToName.get(String(s.to_user))   ?? String(s.to_user),
+        amount:      Number(s.amount ?? 0),
+        from_user_id: String(s.from_user),
+        to_user_id:   String(s.to_user),
+      }));
+      this.settlements.set(rows);
+
+    } catch (e: any) {
+      this.msg.set(e.message ?? 'Errore caricamento bilanci');
+    } finally {
+      this.loading.set(false);
+    }
   }
-}
+
 
 /** Netti: Dovuto' = max(0, Dovuto - wallet[user]) ; Netto' = Pagato - Dovuto' */
 private alignNetsWithWallet(rows: any[], balances: Map<string, number>) {

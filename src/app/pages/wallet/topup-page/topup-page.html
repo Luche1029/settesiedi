@@ -1,7 +1,7 @@
 <div class="card">
   <h3 class="mt">Debiti</h3>
 
-  <div *ngIf="myDebts.length;" class="debt-wrapper">
+  <div *ngIf="!loading() && myDebts.length>0" class="debt-wrapper">
     <div class="debt-row" *ngFor="let d of myDebts; let i = index">
       →<div class="name">{{ d.to_name }}</div>
       <input 
@@ -22,4 +22,21 @@
     <p class="muted">Nessun debito da saldare.</p>
   </ng-template>
 
+   <div *ngFor="let p of received()" class="debt-row">
+     <div class="name">
+      da <b>{{p.from_user_name}}</b>
+     </div>
+    <div class="amount">
+      importo <b>{{ (p.amount_cents/100) | currency:p.currency || 'EUR' }}</b>
+    </div>
+    <div class="name">
+      <span class="badge">{{ p.status }}</span>
+      <!--span class="muted">batch:</span> {{ p.paypal_batch_id || '—' }} -->
+    </div>
+    <button class="btn"
+            *ngIf="p.status !== 'SUCCESS'"
+            (click)="confirmReceived(p)">
+      Conferma
+    </button>
+  </div>
 </div>

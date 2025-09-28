@@ -5,7 +5,7 @@ export type UserProfile = {
   id: string;
   display_name: string;
   email: string;
-  avatar_url: string | null;
+  avatar: string | null;
   is_admin: boolean | null;
   password_hash?: string | null; // solo per capire se è first login
 };
@@ -22,7 +22,7 @@ export class AuthService {
   async listProfiles(): Promise<UserProfile[]> {
     const { data, error } = await supabase
       .from('app_user')
-      .select('id, display_name, email, avatar_url, is_admin, password_hash')
+      .select('id, display_name, email, avatar, is_admin, password_hash')
       .order('display_name');
     if (error) throw error;
     return data as UserProfile[];
@@ -66,7 +66,7 @@ export class AuthService {
     // 2) recupera profilo (senza password_hash)
     const { data: profile, error: e2 } = await supabase
       .from('app_user')
-      .select('id, display_name, email, avatar_url, is_admin')
+      .select('id, display_name, email, avatar, is_admin')
       .eq('id', userId)
       .single();
     if (e2 || !profile) throw e2 || new Error('Profilo non trovato');

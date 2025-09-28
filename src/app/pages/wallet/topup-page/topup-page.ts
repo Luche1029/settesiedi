@@ -5,8 +5,9 @@ import { FormsModule } from '@angular/forms';
 import { PaymentsService } from '../../../services/payments.service';
 import { AuthService } from '../../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { WalletService } from '../../../services/wallet.service';
+import { PayoutRow, WalletService } from '../../../services/wallet.service';
 import { ExpensesService } from '../../../services/expenses.service';
+import { AuthCallbackComponent } from "../../../services/auth-callback.component";
 
 @Component({
   selector: 'app-topup',
@@ -28,12 +29,14 @@ export class TopupPage {
   msg = signal('');
 
   myDebts: Array<{ to_user_id: string; to_name: string; amount_eur: number, max_amount: number }> = [];
+  received = signal<PayoutRow[]>([]);
 
   async ngOnInit() {
     const me = this.auth.user();
     if (!me) { this.msg.set('Fai login'); this.loading.set(false); return; }
 
     await this.loadMyDebts(me.id); 
+    await this.loadReceived(me.id);
 
     const orderId = this.route.snapshot.queryParamMap.get('token');
     if (orderId) {
@@ -64,6 +67,18 @@ export class TopupPage {
       this.loading.set(false);
   }
 
+  private async loadReceived(userId: string) {
+    this.loading.set(true); 
+    this.msg.set('');
+    try {
+      const rows = await this.wallet.listReceivedPayouts(userId);
+      this.received.set(rows);
+    } catch (e: any) {
+      this.msg.set(e?.message ?? 'Errore caricamento pagamenti ricevuti');
+    } finally {
+      this.loading.set(false);
+    }
+  }
 
   /** Paga un singolo debito usando il wallet (PayPal Payout in edge) */
   async payDebt(d: { to_user_id: string; to_name: string; amount_eur: number; max_amount: number }) {
@@ -121,4 +136,13 @@ export class TopupPage {
     d.amount_eur = value;
   }
 
+   async confirmReceived(p: PayoutRow) {
+    try {
+      await this.wallet.confirmPayout(p.id);
+      const me = this.auth.user();
+      if (me) await this.loadReceived(me.id);
+    } catch (e: any) {
+      this.msg.set(e?.message ?? 'Errore conferma pagamento');
+    }
+  }
 }
