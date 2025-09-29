@@ -1,6 +1,6 @@
 <div class="card">
-  <h3 class="mt">Debiti</h3>
 
+  <h4 class="mt">Da pagare</h4>
   <div *ngIf="!loading() && myDebts.length>0" class="debt-wrapper">
     <div class="debt-row" *ngFor="let d of myDebts; let i = index">
       →<div class="name">{{ d.to_name }}</div>
@@ -13,17 +13,31 @@
         value="{{d.amount_eur}}" 
         (keydown)="onKeyDown($event)"
          (keyup)="onKeyUp($event, d)"/>
-      <button class="btn" (click)="payDebt(d)" [disabled]="loading()">Paga {{ d.amount_eur | currency:'EUR' }}</button>
+      <button class="btn" (click)="markDebtAsPaid(d)" [disabled]="loading()" >Paga {{ d.amount_eur | currency:'EUR' }}</button>
     </div>
     {{msg()}}
   </div>
 
-  <ng-template *ngIf="myDebts.length < 1;">
-    <p class="muted">Nessun debito da saldare.</p>
-  </ng-template>
+  <p class="muted" *ngIf="!myDebts || myDebts.length === 0;">Nessun debito da saldare.</p>
+  
+  
+  <h4 class="mt">Pagati</h4>
 
-   <div *ngFor="let p of received()" class="debt-row">
+
+  <h4 class="mt">Da Ricevere</h4>
+  <div *ngFor="let p of incoming()" class="debt-row">
      <div class="name">
+      da <b>{{p.from_name}}</b>
+     </div>
+    <div class="amount">
+      importo <b>{{ p.amount | currency: 'EUR' }}</b>
+    </div>
+
+  </div>
+
+  <h4 class="mt">Ricevuti</h4>
+  <div *ngFor="let p of received()" class="debt-row">
+    <div class="name">
       da <b>{{p.from_user_name}}</b>
      </div>
     <div class="amount">
@@ -35,7 +49,7 @@
     </div>
     <button class="btn"
             *ngIf="p.status !== 'SUCCESS'"
-            (click)="confirmReceived(p)">
+            (click)="confirmReceived(p);">
       Conferma
     </button>
   </div>
