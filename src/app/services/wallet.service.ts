@@ -221,4 +221,40 @@ export class WalletService {
   }
 
 
+  // Uscite: quello che ho pagato (mostra anche PROCESSING/PENDING)
+async getMyPaidOut(userId: string) {
+  const { data, error } = await supabase
+    .from('v_payout_feed')
+    .select('id, created_at, to_user_id, to_name, amount_eur, status, paypal_batch_id')
+    .eq('from_user_id', userId)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+// Entrate in attesa (da ricevere)
+async getToReceive(userId: string) {
+  const { data, error } = await supabase
+    .from('v_payout_feed')
+    .select('id, created_at, from_user_id, from_name, amount_eur, status, paypal_batch_id')
+    .eq('to_user_id', userId)
+    .in('status', ['PENDING','PROCESSING'])
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+// Entrate ricevute (completati)
+async getReceived(userId: string) {
+  const { data, error } = await supabase
+    .from('v_payout_feed')
+    .select('id, created_at, from_user_id, from_name, amount_eur, status, paypal_batch_id')
+    .eq('to_user_id', userId)
+    .eq('status', 'SUCCESS')
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return data ?? [];
+}
+
+
 }
