@@ -14,7 +14,10 @@ export type PayoutRow = {
   id: string;
   from_user_id: string | null;
   from_user_name: string | null;
+    to_user_id?: string | null;
+  to_name?: string | null;      
   amount_cents: number;
+  amount_eur: number;     
   currency: string;
   status: 'PROCESSING'|'PENDING'|'UNCLAIMED'|'SUCCESS'|'FAILED'|string;
 };
@@ -142,25 +145,37 @@ export class WalletService {
       .from('payout')
       .select(`
         id,
+        created_at,
         from_user_id,
         to_user_id,
         amount_cents,
-        status,
-        created_at,
         currency,
-        from_user:from_user_id ( display_name )
+        status,
+        paypal_batch_id,
+        from_user:from_user_id ( display_name ),
+        to_user:to_user_id     ( display_name )
       `)
       .eq('to_user_id', to_user_id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
+
     return (data ?? []).map((r: any) => ({
       id: r.id,
+      created_at: r.created_at,
+
       from_user_id: r.from_user_id,
       from_user_name: r.from_user?.display_name ?? '—',
-      amount_cents: r.amount_cents,
+
+      to_user_id: r.to_user_id,
+      to_name: r.to_user?.display_name ?? null,  // opzionale ma utile per UI coerente
+
+      amount_cents: Number(r.amount_cents ?? 0),
+      amount_eur: +(((r.amount_cents ?? 0) / 100).toFixed(2)),
       currency: r.currency ?? 'EUR',
-      status: String(r.status || 'PROCESSING')
+
+      status: String(r.status || 'PROCESSING') as PayoutRow['status'],
+      paypal_batch_id: r.paypal_batch_id ?? null,
     }));
   }
 

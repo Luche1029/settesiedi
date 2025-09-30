@@ -1,4 +1,3 @@
-// src/app/pages/wallet/topup-page.ts
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -28,7 +27,7 @@ export class TopupPage {
 
   // --- Sezioni UI ---
   pendingDebts: Array<{ to_user_id: string; to_name: string; amount_eur: number; max_amount: number }> = [];
-  paidOut = signal<PayoutRow[]>([]);       // miei payout usciti (storico)
+  paidOut = signal<PayoutRow[]>([]);       
   incoming = signal<ReceivableRow[]>([]);  // da ricevere (PENDING/PROCESSING)
   received = signal<PayoutRow[]>([]);      // ricevuti (SUCCESS)
 
@@ -71,8 +70,8 @@ export class TopupPage {
   /** Debiti residui = settlements_min – payout usciti non FAILED */
   private async loadMyDebts(userId: string) {
     const [all, outByCreditorCents] = await Promise.all([
-      this.expenses.settlementsMin(),                  // [{ from_user, to_user, to_name, amount }]
-      this.wallet.getOutgoingPayoutsByCreditor(userId) // { [to_user]: cents } (SUCCESS/PROCESSING/PENDING)
+      this.expenses.settlementsMin(),                  
+      this.wallet.getOutgoingPayoutsByCreditor(userId) 
     ]);
 
     const getPaidCents = (to: string): number => {
