@@ -49,7 +49,7 @@ export class ProposalEdit implements OnInit {
     try {
       const { data, error } = await supabase
         .from('proposal')
-        .select('id, title, proposal_date, notes, status, proposal_item(id, name, notes)')
+        .select('id, title, proposal_date, notes, status, dish(id, name, notes)')
         .eq('id', id).single();
 
       if (error) throw error;
@@ -60,7 +60,7 @@ export class ProposalEdit implements OnInit {
         notes: data.notes ?? '',
         status: (data.status ?? 'draft') as any
       });
-      this.items.set((data.proposal_item ?? []).map((r: any) => ({
+      this.items.set((data.dish ?? []).map((r: any) => ({
         id: r.id, name: r.name ?? '', notes: r.notes ?? ''
       })));
       if (this.items().length === 0) this.items.set([{ name: '', notes: '' }]);

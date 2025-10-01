@@ -5,12 +5,26 @@ import { RouterModule, Router } from '@angular/router';
 import { ProposalService } from '../../../services/proposal.service';
 import { AuthService } from '../../../services/auth.service';
 
+type ProposalForReview = {
+  id: string;
+  user_id: string;
+  proposal_date: string;
+  notes?: string;
+  status: string;
+  created_at: string;
+  proposerName: string;
+  itemsCount: number;
+  proposal_dish?: Array<{ quantity: number; notes?: string; dish?: { id: string; name: string } }>;
+};
+
 @Component({
   selector: 'app-proposals-review',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './proposals-review.html'
 })
+
+
 export class ProposalsReview implements OnInit {
   private svc = inject(ProposalService);
   private auth = inject(AuthService);
@@ -36,7 +50,7 @@ export class ProposalsReview implements OnInit {
       this.rows.set(list);
       // precompila la data con la proposal_date
       this.eventDates.clear();
-      list.forEach(p => {
+      (list as ProposalForReview[]).forEach((p: ProposalForReview) => {
         const d = p.proposal_date ?? new Date().toISOString().slice(0,10);
         this.eventDates.set(p.id, d);
       });
@@ -57,7 +71,11 @@ export class ProposalsReview implements OnInit {
     try {
       const currentUser = this.auth.user();
       const eventId = await this.svc.approve(p.id, date, currentUser?.id);
-      this.message.set(`Proposta approvata. Creato evento ${eventId.substring(0,8)}…`);
+      if (typeof eventId === 'string') {
+        this.message.set(`Proposta approvata. Creato evento ${eventId.substring(0, 8)}…`);
+      } else {
+        this.message.set('Proposta approvata (evento già creato o approvazione senza RPC).');
+      }
       await this.load();
       // opzionale: vai al dettaglio evento
       // this.router.navigate(['/menus', eventId]);

@@ -1,16 +1,16 @@
 <div class="card">
   <div class="flex" style="align-items:center; justify-content:space-between;">
-    <h2>Le mie proposte</h2>
+    <h2>Le proposte</h2>
     <button class="btn" (click)="createNew()">+ Nuova proposta</button>
   </div>
 
   <!-- Filtri stato -->
   <nav class="tabs mt">
-    <button (click)="setFilter('all')"      [class.active]="status() === 'all'">Tutte</button>
-    <button (click)="setFilter('draft')"    [class.active]="status() === 'draft'">Bozze</button>
+    <button (click)="setFilter('all')"       [class.active]="status() === 'all'">Tutte</button>
+    <button (click)="setFilter('draft')"     [class.active]="status() === 'draft'">Bozze</button>
     <button (click)="setFilter('submitted')" [class.active]="status() === 'submitted'">Inviate</button>
-    <button (click)="setFilter('approved')" [class.active]="status() === 'approved'">Approvate</button>
-    <button (click)="setFilter('rejected')" [class.active]="status() === 'rejected'">Rifiutate</button>
+    <button (click)="setFilter('approved')"  [class.active]="status() === 'approved'">Approvate</button>
+    <button (click)="setFilter('rejected')"  [class.active]="status() === 'rejected'">Rifiutate</button>
   </nav>
 
   <p *ngIf="message()" class="mt">{{ message() }}</p>
@@ -18,20 +18,46 @@
 
   <div class="grid mt" *ngIf="!loading()">
     <div class="event-card" *ngFor="let p of proposals()">
-      <!-- titolo → data proposta -->
+
       <div class="title">{{ p.proposal_date | date:'EEEE d MMMM y' }}</div>
       <small class="muted">{{ p.created_at | date:'short' }}</small>
 
-      <!-- aggiungi nome proponente -->
       <div class="meta">
         <span class="badge">Proposto da: {{ p.proposerName }}</span>
         <span class="badge">Stato: {{ p.status }}</span>
-        <span class="badge ocra">{{ p.itemsCount }} piatti</span>
+
+        <!-- x piatti → click per aprire elenco -->
+        <button class="badge ocra linklike" (click)="toggleItems(p.id)">
+          {{ p.itemsCount }} piatti
+        </button>
+      </div>
+
+      <!-- Elenco piatti (toggle) -->
+      <div class="items mt-xs" *ngIf="expandedId() === p.id">
+        <ul>
+          <li *ngFor="let it of p.proposal_dish">
+            {{ it.dish.name || '—' }} <small class="muted">× {{ it.quantity || 1 }}</small>
+          </li>
+        </ul>
       </div>
 
       <p *ngIf="p.notes" class="mt">{{ p.notes }}</p>
 
-      <div class="actions mt">
+      <!-- Voti: solo se NON sono il proponente -->
+      <div class="vote mt-xs" *ngIf="p.app_user?.id !== user()!.id">
+        <button class="btn icon"
+                [class.active]="p.myVote === 1"
+                [disabled]="voting()"
+                (click)="vote(p, 1)">👍 Mi piace</button>
+        <button class="btn icon"
+                [class.active]="p.myVote === -1"
+                [disabled]="voting()"
+                (click)="vote(p, -1)">👎 Non mi piace</button>
+        <span class="muted ml-sm">Piace a {{ p.votesUp }} · Non piace a {{ p.votesDown }}</span>
+      </div>
+
+      <!-- Azioni: solo del proponente -->
+      <div class="actions mt" *ngIf="p.app_user?.id == user()!.id">
         <button class="btn secondary" (click)="edit(p)">Modifica</button>
         <button class="btn" (click)="submit(p)" [disabled]="p.status !== 'draft'">Invia</button>
         <button class="btn" (click)="duplicate(p)">Duplica</button>
@@ -39,7 +65,6 @@
       </div>
     </div>
   </div>
-
 
   <p *ngIf="!loading() && proposals().length === 0" class="mt muted">
     Nessuna proposta trovata. Creane una nuova!
