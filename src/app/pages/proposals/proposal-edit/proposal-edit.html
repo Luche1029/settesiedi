@@ -1,3 +1,4 @@
+<!-- src/app/pages/proposals/proposal-edit/proposal-edit.html -->
 <div class="card">
   <h2 *ngIf="isNew(); else editT">Nuova proposta</h2>
   <ng-template #editT><h2>Modifica proposta</h2></ng-template>
@@ -6,11 +7,18 @@
     <div class="form-row cols-3">
       <div>
         <label>Titolo</label>
-        <input class="input" [(ngModel)]="proposal().title" name="title" required />
+        <input class="input"
+               [ngModel]="proposal().title"
+               (ngModelChange)="setProposal('title',$event)"
+               name="title"
+               required />
       </div>
       <div>
         <label>Data proposta</label>
-        <input class="input" type="date" [(ngModel)]="proposal().proposed_for" name="proposed_for" />
+        <input class="input" type="date"
+               [ngModel]="proposal().proposal_date"
+               (ngModelChange)="setProposal('proposal_date',$event)"
+               name="proposal_date" />
       </div>
       <div>
         <label>Stato</label>
@@ -21,7 +29,10 @@
     <div class="form-row">
       <div>
         <label>Note</label>
-        <textarea class="input" rows="2" [(ngModel)]="proposal().notes" name="notes"></textarea>
+        <textarea class="input" rows="2"
+                  [ngModel]="proposal().notes"
+                  (ngModelChange)="setProposal('notes',$event)"
+                  name="notes"></textarea>
       </div>
     </div>
 
@@ -31,11 +42,17 @@
         <div class="form-row">
           <div>
             <label>Nome</label>
-            <input class="input" [(ngModel)]="items()[i].name" name="name_{{i}}" />
+            <input class="input"
+                   [ngModel]="items()[i].name"
+                   (ngModelChange)="setItem(i,'name',$event)"
+                   name="name_{{i}}" />
           </div>
           <div>
             <label>Note</label>
-            <input class="input" [(ngModel)]="items()[i].notes" name="notes_{{i}}" />
+            <input class="input"
+                   [ngModel]="items()[i].notes"
+                   (ngModelChange)="setItem(i,'notes',$event)"
+                   name="notes_{{i}}" />
           </div>
         </div>
         <button type="button" class="btn ghost mt" (click)="removeRow(i)">Rimuovi</button>

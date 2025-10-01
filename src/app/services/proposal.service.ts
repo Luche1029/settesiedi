@@ -349,28 +349,29 @@ async reject(proposalId: string) {
  *  Se hai la RPC `approve_proposal` usa quella (crea l'evento e collega i dish).
  *  Altrimenti fallback: solo cambio stato a 'approved'.
  */
-async approve(proposalId: string, eventDate?: string, creatorId?: string): Promise<string | true> {
-  // Prova la RPC (se esiste)
-  const { data, error } = await supabase.rpc('approve_proposal', {
+async approve(proposalId: string, eventDate: string, creatorId?: string): Promise<string | null> {
+  const payload = {
     p_proposal: proposalId,
-    p_event_date: eventDate ?? null,
+    p_event_date: eventDate && eventDate.trim() !== '' ? eventDate : null, // ← niente ''
     p_creator: creatorId ?? null
-  });
+  };
 
-  // Se la RPC non esiste, PostgREST ritorna error.code tipo 'PGRST204' o '42883'
+  const { data, error } = await supabase.rpc('approve_proposal', payload);
+
   if (error) {
-    // Fallback minimale: marca come approved
+    // fallback: marca approved
     const { error: e2 } = await supabase
       .from('proposal')
       .update({ status: 'approved' })
       .eq('id', proposalId);
     if (e2) throw e2;
-    return true;
+    return null;
   }
-
-  // Con RPC: ritorna l'event_id creato
-  return data as string;
+  return data as string; // event_id
 }
+
+
+
 
 
 }

@@ -1,5 +1,9 @@
 button {
     width: 100%;
+
+    &:disabled {
+        color: rgb(221, 219, 219) ;
+    }
 }
 
 .tabs.mt {

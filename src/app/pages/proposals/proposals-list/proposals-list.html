@@ -58,10 +58,10 @@
 
       <!-- Azioni: solo del proponente -->
       <div class="actions mt" *ngIf="p.app_user?.id == user()!.id">
-        <button class="btn secondary" (click)="edit(p)">Modifica</button>
-        <button class="btn" (click)="submit(p)" [disabled]="p.status !== 'draft'">Invia</button>
+        <button class="btn" (click)="edit(p)" [disabled]="p.status !== 'draft'">Modifica</button>
+        <button class="btn" (click)="submit(p)" [disabled]="p.status !== 'draft'">Salva</button>
         <button class="btn" (click)="duplicate(p)">Duplica</button>
-        <button class="btn danger" (click)="remove(p)">Elimina</button>
+        <button class="btn danger" (click)="remove(p)" [disabled]="p.status === 'approved'">Elimina</button>
       </div>
     </div>
   </div>

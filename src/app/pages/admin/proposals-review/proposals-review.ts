@@ -67,6 +67,7 @@ export class ProposalsReview implements OnInit {
 
   async approve(p: any) {
     const date = this.eventDates.get(p.id) || new Date().toISOString().slice(0,10);
+    
     this.loading.set(true); this.message.set('');
     try {
       const currentUser = this.auth.user();
