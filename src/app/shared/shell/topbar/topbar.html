@@ -28,23 +28,26 @@
 
   <div class="spacer" style="flex:1"></div>
 
-  <div class="flex" >
-    <a routerLink="/account" class="link-to-account">
-    <img
-      [src]="avatarUrl()"
-      [alt]="user()?.display_name"
-      width="52" height="52"
-      style="border-radius:50%; border:1px solid var(--hairline);"
-      *ngIf="user(); else guest" />
-      </a>
+  <div class="flex">
+    <a routerLink="/account" class="link-to-account" *ngIf="user(); else guest">
+      <img
+        [src]="avatarUrl() || fallbackAvatar"
+        [alt]="user()?.display_name || 'Avatar'"
+        width="52" height="52"
+        style="border-radius:50%; border:1px solid var(--hairline); object-fit:cover;"
+        (error)="onAvatarError($event)"
+      />
+
+    </a>
     <ng-template #guest>
       <span class="badge">Ospite</span>
-    </ng-template>    
+    </ng-template>
 
     <button *ngIf="user()" class="btn secondary" (click)="logout()">
       <span class="material-symbols-outlined">exit_to_app</span>
     </button>
   </div>
+
 
   
 

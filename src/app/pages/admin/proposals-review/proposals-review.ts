@@ -66,12 +66,13 @@ export class ProposalsReview implements OnInit {
   }
 
   async approve(p: any) {
-    const date = this.eventDates.get(p.id) || new Date().toISOString().slice(0,10);
-    
+    const dateRaw = this.eventDates.get(p.id) || new Date().toISOString().slice(0, 10);
+    const date = dateRaw?.trim() ? dateRaw : null;
+    const currentUser = this.auth.user();
     this.loading.set(true); this.message.set('');
     try {
       const currentUser = this.auth.user();
-      const eventId = await this.svc.approve(p.id, date, currentUser?.id);
+      const eventId = await this.svc.approve(p.id, date);
       if (typeof eventId === 'string') {
         this.message.set(`Proposta approvata. Creato evento ${eventId.substring(0, 8)}…`);
       } else {

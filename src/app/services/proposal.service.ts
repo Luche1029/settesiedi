@@ -335,42 +335,36 @@ async createProposal(userId: string, payload: ProposalInput, status: string) {
     return data as string; // event_id
   }
 
-/** Rifiuta la proposta */
-async reject(proposalId: string) {
-  const { error } = await supabase
-    .from('proposal')
-    .update({ status: 'rejected' })
-    .eq('id', proposalId);
-  if (error) throw error;
-  return true;
-}
-
-/** Approva la proposta.
- *  Se hai la RPC `approve_proposal` usa quella (crea l'evento e collega i dish).
- *  Altrimenti fallback: solo cambio stato a 'approved'.
- */
-async approve(proposalId: string, eventDate: string, creatorId?: string): Promise<string | null> {
-  const payload = {
-    p_proposal: proposalId,
-    p_event_date: eventDate && eventDate.trim() !== '' ? eventDate : null, // ← niente ''
-    p_creator: creatorId ?? null
-  };
-
-  const { data, error } = await supabase.rpc('approve_proposal', payload);
-
-  if (error) {
-    // fallback: marca approved
-    const { error: e2 } = await supabase
+  /** Rifiuta la proposta */
+  async reject(proposalId: string) {
+    const { error } = await supabase
       .from('proposal')
-      .update({ status: 'approved' })
+      .update({ status: 'rejected' })
       .eq('id', proposalId);
-    if (e2) throw e2;
-    return null;
+    if (error) throw error;
+    return true;
   }
-  return data as string; // event_id
-}
 
+  /** Approva la proposta. **/
+  async approve(proposalId: string, eventDate?: string | null): Promise<string | null> {
+    const date = eventDate && eventDate.trim() ? eventDate : null;
 
+    const { data, error } = await supabase.rpc('approve_proposal', {
+      p_proposal: proposalId,
+      p_event_date: date
+    });
+
+    if (error) {
+      // fallback: marca almeno approved
+      const { error: e2 } = await supabase
+        .from('proposal')
+        .update({ status: 'approved' })
+        .eq('id', proposalId);
+      if (e2) throw e2;
+      return null;
+    }
+    return data as string; // event_id
+  }
 
 
 
